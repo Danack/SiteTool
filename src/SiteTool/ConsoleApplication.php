@@ -20,10 +20,10 @@ class ConsoleApplication extends Application
         $statsCommand->setDescription("Hello world test.");
         $this->add($statsCommand);
         
-        $statsCommand = new Command('site:crawl', 'SiteTool\Crawler::run');
-        $statsCommand->setDescription("Crawls a site");
-        $this->add($statsCommand);
-    
+        $crawlerCommand = new Command('site:crawl', 'SiteTool\Crawler::run');
+        $crawlerCommand->setDescription("Crawls a site");
+        $crawlerCommand->addArgument('domainName', InputArgument::REQUIRED, 'The domain name to be crawled');
+        $this->add($crawlerCommand);
 
 //        $envWriteCommand = new Command('genEnvSettings', 'ImagickDemo\Config\EnvConfWriter::writeEnvFile');
 //        $envWriteCommand->setDescription("Write an env setting bash script.");

@@ -12,57 +12,77 @@ use FluentDOM\Element;
 
 class SiteChecker
 {
-    /**
-     * @var URLResult[]
-     */
-    private $urlsChecked = [];
-    
     /** @var URLToCheck[] */
     private $urlsToCheck = [];
-    
-    // private $siteURL;
     
     /** @var CrawlerConfig  */
     private $crawlerConfig;
     
-    private $count = 0;
-
     private $errors = 0;
     
     /** @var Rules  */
     private $rules;
+    
+    private $count = 0;
 
     /**
      * @var ArtaxClient
      */
     private $artaxClient;
+
+    /** @var  \SiteTool\ResultWriter */
+    private $resultWriter;
+
+    /** @var  \SiteTool\StatusWriter */
+    private $statusWriter;
     
-    /** @var Output  */
-    private $output;
+    private $maxCount;
     
-    function __construct(CrawlerConfig $crawlerConfig, ArtaxClient $artaxClient)
-    {
+    function __construct(
+        CrawlerConfig $crawlerConfig,
+        ArtaxClient $artaxClient,
+        ResultWriter $resultWriter,
+        StatusWriter $statusWriter,
+        $maxCount
+    ) {
         $this->crawlerConfig = $crawlerConfig;
         $this->artaxClient = $artaxClient;
-        $this->rules = new Rules($crawlerConfig);
+        $this->rules = new Rules($crawlerConfig, $statusWriter);
+        $this->resultWriter = $resultWriter;
+        $this->statusWriter = $statusWriter;
         
-        $this->output = new Output();
+        $this->maxCount = $maxCount;
         
         // This is nice.
         libxml_use_internal_errors(true);
     }
-    
+
+    /**
+     * @param \Exception $e
+     * @param Response $response
+     * @param $fullURL
+     * @return null
+     */
     function handleException(\Exception $e, Response $response = null, $fullURL)
     {
-        echo "Something went wrong for $fullURL : ".$e->getMessage()."\n";
+        $message = "Something went wrong for $fullURL : " . $e->getMessage();
         if ($response) {
-            var_dump($response->getAllHeaders());
+            $message .= "Headers " . var_export($response->getAllHeaders(), true);
         }
+        $this->statusWriter->write($message);
         $this->errors++;
+
         return null;
     }
-    
-    
+
+    /**
+     * @param \Exception $e
+     * @param Response $response
+     * @param UrlToCheck $urlToCheck
+     * @param $fullURL
+     * @return null|void
+     * @throws \Exception
+     */
     function analyzeResult(\Exception $e = null, Response $response = null, UrlToCheck $urlToCheck, $fullURL)
     {
         if ($e) {
@@ -71,22 +91,29 @@ class SiteChecker
         }
     
         $status = $response->getStatus();
-        $this->urlsChecked[] = new URLResult(
+        
+        $this->resultWriter->write(
             $urlToCheck->getUrl(),
             $status,
             $urlToCheck->getReferrer(),
             substr($response->getBody(), 0, 200)
         );
-    
+
         if ($status != 200 && $status != 420 && $status != 202) {
-            echo "Status is not ok for " . $urlToCheck->getUrl()."\n";
+            $this->statusWriter->write("Status $status is not OK for " . $urlToCheck->getUrl());
             $this->errors++;
             return null;
         }
     
         $this->analyzeResponse($response, $urlToCheck);
     }
-    
+
+    /**
+     * @param Response $response
+     * @param UrlToCheck $urlToCheck
+     * @return null
+     * @throws \Exception
+     */
     public function analyzeResponse(Response $response, UrlToCheck $urlToCheck)
     {
         $contentTypeHeaders = $response->getHeader('Content-Type');
@@ -130,11 +157,6 @@ class SiteChecker
         }
     }
 
-    function getURLCount()
-    {
-        return count($this->urlsChecked);
-    }
-    
     function getErrorCount()
     {
         return $this->errors;
@@ -145,19 +167,15 @@ class SiteChecker
      */
     function fetchURL(URLToCheck $urlToCheck)
     {
-        $this->count++;
-        
-        if ($this->count > 2000) {
-            return;
-        }
-        $fullURL = $urlToCheck->getUrl();        
-        $this->output->gettingUrl($fullURL);
+        $fullURL = $urlToCheck->getUrl();
+        $this->statusWriter->write("Adding $fullURL from referrer " . $urlToCheck->getReferrer());
         $promise = $this->artaxClient->request($fullURL);
 
         $analyzeResult = function(
             \Exception $e = null,
             Response $response = null
         ) use ($urlToCheck, $fullURL) {
+            $this->statusWriter->write("Getting $fullURL");
             return $this->analyzeResult($e, $response, $urlToCheck, $fullURL);
         };
 
@@ -185,6 +203,10 @@ class SiteChecker
         $this->addLinkToProcess($href, $referrer);
     }
 
+    /**
+     * @param $href
+     * @param $referrer
+     */
     function addLinkToProcess($href, $referrer)
     {
         $urlToCheck = $this->rules->getUrlToCheck($href, $referrer);
@@ -204,15 +226,12 @@ class SiteChecker
             return;
         }
         
-//        if ($this->rules->shouldFollowURLToCheck($urlToCheck) == false) {
-//            return;
-//        }
-        
-        
-//        if (strpos($urlToCheck->getUrl(), '/') !== 0) {
-//            $this->urlsToCheck[$url] = new URLResult($url, 200, $urlToCheck->getReferrer());
-//            return;
-//        }
+        $this->count++;
+
+        if ($this->count > $this->maxCount) {
+            $this->statusWriter->write("Skipping " . $urlToCheck->getUrl() . " as $maxCount urls already checked.");
+            return null;
+        }
 
         $this->urlsToCheck[$url] = null;
         $this->fetchURL($urlToCheck);
@@ -229,9 +248,7 @@ class SiteChecker
 
         try {
             $document = new Document();
-            
             $document->loadHTML($body);
-
             $linkClosure = function (Element $element) use ($urlToCheck) {
                 $this->parseLinkResult($element, $urlToCheck->getUrl());
             };
@@ -241,34 +258,40 @@ class SiteChecker
     
             $document->find('//a')->each($linkClosure);
             //$document->find('//img')->each($imgClosure);
-
             $ok = true;
         }
         catch (SocketException $se) {
-            $this->urlsChecked[] = new URLResult($path, 500, "Artax\\SocketException on $path - ".$se->getMessage(). " Exception type is ".get_class($se));
+            $message = "Artax\\SocketException on $path - ".$se->getMessage(). " Exception type is ".get_class($se);
+            $this->resultWriter->write(
+                $path,
+                500,
+                $urlToCheck->getReferrer(),
+                $message
+            );
         }
         catch(\InvalidArgumentException $iae) {
-            $this->urlsChecked[] = new URLResult($path, 500, "Fluent dom exception on $path - ".$iae->getMessage(). " Exception type is ".get_class($iae));
+            $message = "Fluent dom exception on $path - ".$iae->getMessage(). " Exception type is ".get_class($iae);
+            $this->resultWriter->write(
+                $path,
+                500,
+                $urlToCheck->getReferrer(),
+                $message
+            );
         }
         catch(\Exception $e) {
-            //echo "Error getting $path - ".$e->getMessage(). " Exception type is ".get_class($e)." \n";
-            $this->urlsChecked[] = new URLResult($path, 500, "Error getting $path - ".$e->getMessage(). " Exception type is ".get_class($e));
+            $message = "Error getting $path - " . $e->getMessage() . " Exception type is " . get_class($e);
+            $message .= $e->getTraceAsString();
             
-            file_put_contents("test.html", $body);
-            
-            echo $e->getTraceAsString();
+            $this->resultWriter->write(
+                $path,
+                500,
+                $urlToCheck->getReferrer(),
+                $message
+            );
         }
 
         if ($ok != true) {
             $this->errors++;
         }
-    }
-
-    /**
-     * @return URLResult[]
-     */
-    function getResults()
-    {
-        return $this->urlsChecked;
     }
 }

@@ -8,34 +8,33 @@ use SiteTool\Printer\HTMLPrinter;
 
 class Crawler
 {
-    public function run(ArtaxClient $artaxClient)
+    private $domainName;
+    
+    public function __construct($domainName)
     {
-        $site = "www.olivemagazine.com";
-        
+        $this->domainName = $domainName;
+    }
+
+    public function run(
+        ArtaxClient $artaxClient,
+        ResultWriter $resultWriter,
+        StatusWriter $statusWriter,
+        $maxCount
+    ) {
         $crawlerConfig = new CrawlerConfig(
             'http',
-            "www.olivemagazine.com",
+            $this->domainName,
             '/'
         );
-        
-        $siteChecker = new SiteChecker($crawlerConfig, $artaxClient);
 
+        $siteChecker = new SiteChecker($crawlerConfig, $artaxClient, $resultWriter, $statusWriter, $maxCount);
         $fn = function() use ($siteChecker) {
-            $start = new URLToCheck('http://www.olivemagazine.com/', '/');
+            $start = new URLToCheck('http://' . $this->domainName . '/', '/');
             $siteChecker->checkURL($start);
         };
 
-        //$reactor->run();
         \Amp\run($fn);
         
-        echo "fin";
-        
-        $printer = new HTMLPrinter($siteChecker->getResults(), $site);
-
-        $outputStream = fopen("./checkResults.html", "w");
-        $printer->output($outputStream);
-        fclose($outputStream);
-        echo "Check complete. Found ".$siteChecker->getURLCount()." URIs with ".$siteChecker->getErrorCount()." errors.";
-
+        $statusWriter->write("fin.");
     }
 }

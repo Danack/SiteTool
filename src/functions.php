@@ -6,7 +6,7 @@ function createArtaxClient()
 {
     $client = new ArtaxClient();
     $client->setOption(\Amp\Artax\Client::OP_MS_CONNECT_TIMEOUT, 2500);
-    $client->setOption(ArtaxClient::OP_HOST_CONNECTION_LIMIT, 4);
+    $client->setOption(ArtaxClient::OP_HOST_CONNECTION_LIMIT, 8);
 
     return $client;
 }

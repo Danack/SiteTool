@@ -3,13 +3,20 @@
 
 namespace SiteTool;
 
+use SiteTool\StatusWriter;
+
 class Rules
 {
     private $crawlerConfig;
+
+    private $statusWriter;
     
-    public function __construct(CrawlerConfig $crawlerConfig)
+    public function __construct(
+        CrawlerConfig $crawlerConfig,
+        StatusWriter $statusWriter)
     {
         $this->crawlerConfig = $crawlerConfig;
+        $this->statusWriter = $statusWriter;
     }
 
     /**
@@ -19,7 +26,7 @@ class Rules
      */
     public function getUrlToCheck($href, $referrer)
     {
-        $parsedUrl = parse_url($href);
+        
 
         $knownNonLinks = [
             'mailto',
@@ -28,39 +35,33 @@ class Rules
         
         foreach ($knownNonLinks as $knownNonLink) {
             if (stripos($href, $knownNonLink) === 0) {
+                /// $this->statusWriter->write("skipping known non-link $knownNonLink");
                 return null;
             }
         }
-    
         
+        if (strpos($href, '//') === 0) {
+            $href = sprintf("%s://%s",
+                $this->crawlerConfig->schema, // todo, should be schema of referer
+                substr($href, 2)
+            );
+        }
+
+        
+        $parsedUrl = parse_url($href);
+
         if (array_key_exists('host', $parsedUrl) === true) {
             // If it points to a different domain, don't follow.
             if (stripos($parsedUrl['host'], $this->crawlerConfig->domainName) === false) {
-//                echo "here";
-//                exit(0);
+                // $this->statusWriter->write("Skipping $href as host " . $parsedUrl['host'] . " is different.");
                 return null;
             }
-
-//            echo "here 2 $href";
-//                exit(0);
+            // $this->statusWriter->write("Following absolute URL $href");
             // If it points to same domain, follow.
             return new UrlToCheck($href, $referrer);
-            
         }
 
-
-        
-        if (strpos($href, '//') === 0) {
-            $url = sprintf("%s://%s",
-                $this->crawlerConfig->schema,
-                substr($href, 2)
-            );
-            return new UrlToCheck(
-                $url,
-                $referrer
-            );
-        }
-        
+        //$this->statusWriter->write("Following relative path $href");
         
         //It's relative
         return new UrlToCheck(
