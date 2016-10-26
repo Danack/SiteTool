@@ -29,8 +29,9 @@ class Rules
         
 
         $knownNonLinks = [
-            'mailto',
-            'javascript',
+            'mailto',       // Mail links
+            'javascript',   // Javascript
+            '#',            // Anchor tags
         ];
         
         foreach ($knownNonLinks as $knownNonLink) {
