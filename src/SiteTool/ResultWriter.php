@@ -6,10 +6,5 @@ namespace SiteTool;
 
 interface ResultWriter
 {
-    public function write(
-        $url,
-        $status,
-        $referrer,
-        $body
-    );
+    public function write($string, ...$otherStrings);
 }

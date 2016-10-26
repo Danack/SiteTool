@@ -15,7 +15,6 @@ class FileResultWriter implements ResultWriter
     public function __construct($filename)
     {
         $this->fileHandle = fopen($filename, "w");
-        
         if ($this->fileHandle === false) {
             throw new SiteToolException("Failed to open $filename for writing.");
         }
@@ -28,20 +27,16 @@ class FileResultWriter implements ResultWriter
         }
     }
 
-    public function write(
-        $url,
-        $status,
-        $referrer,
-        $body
-    ) {
-        $string = sprintf(
-            "%s, %s, %s\n",
-            $status,
-            $url,
-            $referrer//,
-            //$body
-        );
+    public function write($string, ...$otherStrings)
+    {
+        $line = $string;
+        if (count($otherStrings) !== 0) {
+            $line .= ", ";
+        }
 
-        fwrite($this->fileHandle, $string);
+        $line .= implode(", ", $otherStrings);
+        $line .= "\n";
+
+        fwrite($this->fileHandle, $line);
     }
 }

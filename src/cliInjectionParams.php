@@ -11,30 +11,25 @@ $shares = [
 // Alias interfaces (or classes) to the actual types that should be used 
 // where they are required. 
 $aliases = [
-    //'ArtaxServiceBuilder\ResponseCache' => 'ArtaxServiceBuilder\ResponseCache\FileResponseCache',
-    'Danack\Console\Application' => 'SiteTool\ConsoleApplication',
     SiteTool\StatusWriter::class => SiteTool\StatusWriter\StdoutStatusWriter::class,
-    SiteTool\ResultWriter::class => SiteTool\ResultWriter\FileResultWriter::class
+    SiteTool\ResultWriter::class => SiteTool\ResultWriter\FileResultWriter::class,
+    SiteTool\ResultReader::class => SiteTool\ResultReader\StandardResultReader::class,
 ];
 
 // Delegate the creation of types to callables.
 $delegates = [
-    //'ArtaxServiceBuilder\Oauth2Token' => 'ServerContainer\App::getOauthToken',
-    //'Amp\Reactor' => 'Amp\getReactor',
-    //'ServerContainer\Tool\EC2Manager' => 'ServerContainer\App::createEC2Manager',
-    //'ServerContainer\Tool\KillEC2TestInstances' => 'ServerContainer\App::createKillEC2TestInstances'
+    Danack\Console\Application::class => 'createApplication'
 ];
 
 
 // If necessary, define some params per class.
 $classParams = [
-//    'cacheDirectory' => realpath(__DIR__."/../var/cache"),
-//    'tempDirectory' => realpath(__DIR__."/../var/tmp"),
-//    'userAgent' => 'Danack/ServerContainer'
-
-    SiteTool\ResultWriter\FileResultWriter::class => [
-        ':filename' => 'output.txt'
-    ]
+//    SiteTool\ResultWriter\FileResultWriter::class => [
+//        ':filename' => 'output.txt'
+//    ],
+//    SiteTool\ResultReader\StandardResultReader::class => [
+//        ':filename' => 'output.txt'
+//    ],
 ];
 
 

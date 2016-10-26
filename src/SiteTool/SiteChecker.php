@@ -50,7 +50,6 @@ class SiteChecker
         $this->rules = new Rules($crawlerConfig, $statusWriter);
         $this->resultWriter = $resultWriter;
         $this->statusWriter = $statusWriter;
-        
         $this->maxCount = $maxCount;
         
         // This is nice.
@@ -91,7 +90,7 @@ class SiteChecker
         }
     
         $status = $response->getStatus();
-        
+
         $this->resultWriter->write(
             $urlToCheck->getUrl(),
             $status,

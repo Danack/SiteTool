@@ -10,14 +10,10 @@ require_once(__DIR__.'/../vendor/autoload.php');
 
 CLIFunction::setupErrorHandlers();
 
-// We're on the CLI - let errors be seen.
-// ini_set('display_errors', 'off');
-
-//require_once __DIR__.'/../../clavis.php';
-
 $injector = new Injector();
 
 $standardInjectionParams = require __DIR__."/../src/injectionParams.php";
+
 /** @var $injectionParams \AurynConfig\InjectionParams */
 $standardInjectionParams->addToInjector($injector);
 
@@ -25,22 +21,7 @@ $cliInjectionParams = require __DIR__."/cliInjectionParams.php";
 /** @var $cliInjectionParams \AurynConfig\InjectionParams */
 $cliInjectionParams->addToInjector($injector);
 
-//$injector->alias('Danack\Console\Application', 'ImagickDemo\ConsoleApplication');
-//$exceptionResolver = TierCLIApp::createStandardExceptionResolver();
-//$exceptionResolver->addExceptionHandler(
-//    'ServerContainer\UserErrorMessageException',
-//    ['ServerContainer\App', 'handleUserErrorMessageException']
-//);
-//
-//$exceptionResolver->addExceptionHandler(
-//    'ServerContainer\ServerContainerException',
-//    ['ServerContainer\App', 'handleServerContainerException']
-//);
-
-$tierApp = new TierCLIApp(
-    $injector
-);
-
+$tierApp = new TierCLIApp($injector);
 
 define('TIER_ROUTING', 10);
 
