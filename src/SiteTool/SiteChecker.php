@@ -7,8 +7,7 @@ use Amp\Artax\SocketException;
 use Amp\Artax\Response;
 use FluentDOM\Document;
 use FluentDOM\Element;
-
-
+use SiteTool\ResultWriter\FileResultWriter;
 
 class SiteChecker
 {
@@ -49,6 +48,9 @@ class SiteChecker
         $this->artaxClient = $artaxClient;
         $this->rules = new Rules($crawlerConfig, $statusWriter);
         $this->resultWriter = $resultWriter;
+        
+
+        
         $this->statusWriter = $statusWriter;
         $this->maxCount = $maxCount;
         
@@ -94,12 +96,12 @@ class SiteChecker
         $this->resultWriter->write(
             $urlToCheck->getUrl(),
             $status,
-            $urlToCheck->getReferrer(),
-            substr($response->getBody(), 0, 200)
+            $urlToCheck->getReferrer()
         );
 
         if ($status != 200 && $status != 420 && $status != 202) {
             $this->statusWriter->write("Status $status is not OK for " . $urlToCheck->getUrl());
+            //          substr($response->getBody(), 0, 200)
             $this->errors++;
             return null;
         }
@@ -247,6 +249,7 @@ class SiteChecker
 
         try {
             $document = new Document();
+            $body = mb_convert_encoding($body, 'HTML-ENTITIES', 'UTF-8');
             $document->loadHTML($body);
             $linkClosure = function (Element $element) use ($urlToCheck) {
                 $this->parseLinkResult($element, $urlToCheck->getUrl());

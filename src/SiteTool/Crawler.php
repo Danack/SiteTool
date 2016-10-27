@@ -5,6 +5,7 @@ namespace SiteTool;
 
 use Amp\Artax\Client as ArtaxClient;
 use SiteTool\Printer\HTMLPrinter;
+use SiteTool\ResultWriter\FileResultWriter;
 
 class Crawler
 {
@@ -17,7 +18,7 @@ class Crawler
 
     public function run(
         ArtaxClient $artaxClient,
-        ResultWriter $resultWriter,
+        //ResultWriter $resultWriter,
         StatusWriter $statusWriter,
         $maxCount
     ) {
@@ -26,6 +27,8 @@ class Crawler
             $this->domainName,
             '/'
         );
+        
+        $resultWriter = new FileResultWriter("output.txt");
 
         $siteChecker = new SiteChecker($crawlerConfig, $artaxClient, $resultWriter, $statusWriter, $maxCount);
         $fn = function() use ($siteChecker) {

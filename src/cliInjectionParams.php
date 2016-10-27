@@ -12,7 +12,7 @@ $shares = [
 // where they are required. 
 $aliases = [
     SiteTool\StatusWriter::class => SiteTool\StatusWriter\StdoutStatusWriter::class,
-    SiteTool\ResultWriter::class => SiteTool\ResultWriter\FileResultWriter::class,
+    //SiteTool\ResultWriter::class => SiteTool\ResultWriter\FileResultWriter::class,
     SiteTool\ResultReader::class => SiteTool\ResultReader\StandardResultReader::class,
 ];
 
