@@ -86,6 +86,8 @@ class SiteChecker
      */
     function analyzeResult(\Exception $e = null, Response $response = null, UrlToCheck $urlToCheck, $fullURL)
     {
+        static $first = true;
+        
         if ($e) {
             $this->handleException($e, $response, $fullURL);
             return;
@@ -100,10 +102,14 @@ class SiteChecker
         );
 
         if ($status != 200 && $status != 420 && $status != 202) {
-            $this->statusWriter->write("Status $status is not OK for " . $urlToCheck->getUrl());
-            //          substr($response->getBody(), 0, 200)
-            $this->errors++;
-            return null;
+            if ($first == true) {
+                $first = false;
+            }
+            else {
+                $this->statusWriter->write("Status $status is not OK for " . $urlToCheck->getUrl());
+                $this->errors++;
+                return null;
+            }
         }
     
         $this->analyzeResponse($response, $urlToCheck);
@@ -228,9 +234,14 @@ class SiteChecker
         }
         
         $this->count++;
-
         if ($this->count > $this->maxCount) {
-            $this->statusWriter->write("Skipping " . $urlToCheck->getUrl() . " as $maxCount urls already checked.");
+            $message = sprintf(
+                "Skipping %s as %s urls already checked.",
+                $urlToCheck->getUrl(),
+                $this->maxCount
+            );
+            
+            $this->statusWriter->write($message);
             return null;
         }
 

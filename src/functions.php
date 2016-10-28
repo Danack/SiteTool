@@ -6,6 +6,15 @@ use Danack\Console\Command\Command;
 use Danack\Console\Input\InputArgument;
 use Danack\Console\Input\InputOption;
 
+
+function getRawCharacters($result)
+{
+    $resultInHex = unpack('H*', $result);
+    $resultInHex = $resultInHex[1];
+    $resultSeparated = implode(', ', str_split($resultInHex, 2)); //byte safe
+    return $resultSeparated;
+}
+
 function createArtaxClient($jobs)
 {
     $client = new ArtaxClient();
@@ -14,7 +23,6 @@ function createArtaxClient($jobs)
 
     return $client;
 }
-
 
 function createApplication()
 {
@@ -30,10 +38,6 @@ function createApplication()
     $crawlerCommand->addOption('jobs', 'j', InputOption::VALUE_OPTIONAL, "How many requests to make at once to a domain", 4);
     $application->add($crawlerCommand);
 
-    
-    
-    
-    
     
     $migrateCheckCommand = new Command('site:migratecheck', 'SiteTool\MigrateCheck::run');
     $migrateCheckCommand->setDescription("Check that all the urls from an old site are migrated to a new domain correctly.");

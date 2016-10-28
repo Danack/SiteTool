@@ -30,6 +30,8 @@ class Crawler
         
         $resultWriter = new FileResultWriter("output.txt");
 
+        $resultWriter = new FileResultWriter("output.txt");
+
         $siteChecker = new SiteChecker($crawlerConfig, $artaxClient, $resultWriter, $statusWriter, $maxCount);
         $fn = function() use ($siteChecker) {
             $start = new URLToCheck('http://' . $this->domainName . '/', '/');
