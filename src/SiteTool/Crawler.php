@@ -4,8 +4,10 @@
 namespace SiteTool;
 
 use Amp\Artax\Client as ArtaxClient;
+use SiteTool\ErrorWriter\FileErrorWriter;
 use SiteTool\Printer\HTMLPrinter;
 use SiteTool\ResultWriter\FileResultWriter;
+use Zend\EventManager\EventManager;
 
 class Crawler
 {
@@ -20,6 +22,7 @@ class Crawler
         ArtaxClient $artaxClient,
         //ResultWriter $resultWriter,
         StatusWriter $statusWriter,
+        EventManager $eventManager,
         $maxCount
     ) {
         $crawlerConfig = new CrawlerConfig(
@@ -29,10 +32,17 @@ class Crawler
         );
         
         $resultWriter = new FileResultWriter("output.txt");
+        $errorWriter = new FileErrorWriter("error.txt");
 
-        $resultWriter = new FileResultWriter("output.txt");
-
-        $siteChecker = new SiteChecker($crawlerConfig, $artaxClient, $resultWriter, $statusWriter, $maxCount);
+        $siteChecker = new SiteChecker(
+            $crawlerConfig,
+            $artaxClient,
+            $resultWriter,
+            $statusWriter,
+            $errorWriter,
+            $eventManager,
+            $maxCount
+        );
         $fn = function() use ($siteChecker) {
             $start = new URLToCheck('http://' . $this->domainName . '/', '/');
             $siteChecker->checkURL($start);

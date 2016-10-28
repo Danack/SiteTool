@@ -32,32 +32,19 @@ HTML;
         return $html;
     }
 
-    
+
     public function testParsing() 
     {
         $body = $this->createData();
 
         $document = new Document();
+        $body = mb_convert_encoding($body, 'HTML-ENTITIES', 'UTF-8');
         $document->loadHTML($body);
         $linkClosure = function (Element $element)  {
-
             $href = $element->getAttribute('href');
-            var_dump($href);
-            
-            
-
-            echo "\n";
-            echo getRawCharacters($href);
-            echo "\n";
-            exit(0);
-            
             $this->assertEquals(4, mb_strlen($href));
-            exit(0);
-            
         };
-        
         $document->find('//a')->each($linkClosure);
-        
     }
     
 }

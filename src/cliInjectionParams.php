@@ -5,7 +5,8 @@ use AurynConfig\InjectionParams;
 // These classes will only be created  by the injector once
 $shares = [
     SiteTool\StatusWriter::class,
-    SiteTool\ResultWriter::class
+    SiteTool\ResultWriter::class,
+    Zend\EventManager\EventManager::class,
 ];
 
 // Alias interfaces (or classes) to the actual types that should be used 
@@ -24,12 +25,6 @@ $delegates = [
 
 // If necessary, define some params per class.
 $classParams = [
-//    SiteTool\ResultWriter\FileResultWriter::class => [
-//        ':filename' => 'output.txt'
-//    ],
-//    SiteTool\ResultReader\StandardResultReader::class => [
-//        ':filename' => 'output.txt'
-//    ],
 ];
 
 

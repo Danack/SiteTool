@@ -37,6 +37,7 @@
         "danack/console": "~2.6",
         "danack/tier": "^0.7.1",
         "fluentdom/fluentdom": "~5.3",
-        "amphp/artax": "~2.0"
+        "amphp/artax": "~2.0",
+        "zendframework/zend-eventmanager": "^3.0"
     }
 }

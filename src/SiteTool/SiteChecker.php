@@ -8,9 +8,20 @@ use Amp\Artax\Response;
 use FluentDOM\Document;
 use FluentDOM\Element;
 use SiteTool\ResultWriter\FileResultWriter;
+use SiteTool\ErrorWriter;
+use Zend\EventManager\EventManager;
+
+
 
 class SiteChecker
 {
+    const HTTP_RESPONSE     = 'http_response';
+    const HTML_RECEIVED     = 'html_received';
+    const FOUND_HREF        = 'found_href';
+    const FOUND_URL_TO_SCAN = 'found_url_to_scan';
+    const REQUEST_ERROR     = 'request_error';
+    const PARSING_ERROR     = 'parsing_error';
+    
     /** @var URLToCheck[] */
     private $urlsToCheck = [];
     
@@ -35,6 +46,9 @@ class SiteChecker
     /** @var  \SiteTool\StatusWriter */
     private $statusWriter;
     
+    /** @var EventManager */
+    private $eventManager;
+    
     private $maxCount;
     
     function __construct(
@@ -42,21 +56,24 @@ class SiteChecker
         ArtaxClient $artaxClient,
         ResultWriter $resultWriter,
         StatusWriter $statusWriter,
+        ErrorWriter $errorWriter,
+        EventManager $eventManager,
         $maxCount
     ) {
         $this->crawlerConfig = $crawlerConfig;
         $this->artaxClient = $artaxClient;
-        $this->rules = new Rules($crawlerConfig, $statusWriter);
+        $this->rules = new Rules($crawlerConfig, $statusWriter, $errorWriter);
         $this->resultWriter = $resultWriter;
-        
-
-        
         $this->statusWriter = $statusWriter;
+        $this->errorWriter = $errorWriter;
+        $this->eventManager = $eventManager;
         $this->maxCount = $maxCount;
         
         // This is nice.
         libxml_use_internal_errors(true);
     }
+    
+    
 
     /**
      * @param \Exception $e
@@ -139,6 +156,8 @@ class SiteChecker
         switch ($contentType) {
             case ('text/html'): {
                 $this->analyzeHtmlBody($urlToCheck, $response->getBody());
+
+                $this->eventManager->trigger(SiteChecker::HTML_RECEIVED, $urlToCheck, $response->getBody())
                 break;
             }
 
@@ -249,62 +268,5 @@ class SiteChecker
         $this->fetchURL($urlToCheck);
     }
 
-    /**
-     * @param URLToCheck $urlToCheck
-     * @param $body
-     */
-    function analyzeHtmlBody(URLToCheck $urlToCheck, $body)
-    {
-        $ok = false;
-        $path = $urlToCheck->getUrl();
 
-        try {
-            $document = new Document();
-            $body = mb_convert_encoding($body, 'HTML-ENTITIES', 'UTF-8');
-            $document->loadHTML($body);
-            $linkClosure = function (Element $element) use ($urlToCheck) {
-                $this->parseLinkResult($element, $urlToCheck->getUrl());
-            };
-            $imgClosure = function (Element $element) use ($urlToCheck) {
-                $this->parseImgResult($element, $urlToCheck->getUrl());
-            };
-    
-            $document->find('//a')->each($linkClosure);
-            //$document->find('//img')->each($imgClosure);
-            $ok = true;
-        }
-        catch (SocketException $se) {
-            $message = "Artax\\SocketException on $path - ".$se->getMessage(). " Exception type is ".get_class($se);
-            $this->resultWriter->write(
-                $path,
-                500,
-                $urlToCheck->getReferrer(),
-                $message
-            );
-        }
-        catch(\InvalidArgumentException $iae) {
-            $message = "Fluent dom exception on $path - ".$iae->getMessage(). " Exception type is ".get_class($iae);
-            $this->resultWriter->write(
-                $path,
-                500,
-                $urlToCheck->getReferrer(),
-                $message
-            );
-        }
-        catch(\Exception $e) {
-            $message = "Error getting $path - " . $e->getMessage() . " Exception type is " . get_class($e);
-            $message .= $e->getTraceAsString();
-            
-            $this->resultWriter->write(
-                $path,
-                500,
-                $urlToCheck->getReferrer(),
-                $message
-            );
-        }
-
-        if ($ok != true) {
-            $this->errors++;
-        }
-    }
 }

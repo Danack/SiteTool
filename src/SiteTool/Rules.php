@@ -4,6 +4,7 @@
 namespace SiteTool;
 
 use SiteTool\StatusWriter;
+use SiteTool\ErrorWriter;
 
 class Rules
 {
@@ -13,10 +14,12 @@ class Rules
     
     public function __construct(
         CrawlerConfig $crawlerConfig,
-        StatusWriter $statusWriter)
-    {
+        StatusWriter $statusWriter,
+        ErrorWriter $errorWriter
+    ) {
         $this->crawlerConfig = $crawlerConfig;
         $this->statusWriter = $statusWriter;
+        $this->errorWriter = $errorWriter;
     }
 
     /**
@@ -26,12 +29,14 @@ class Rules
      */
     public function getUrlToCheck($href, $referrer)
     {
-        
-
         $knownNonLinks = [
             'mailto',       // Mail links
             'javascript',   // Javascript
             '#',            // Anchor tags
+            'tel',          // telephone number
+            'fax',
+            'skype',
+            'sms:',
         ];
         
         foreach ($knownNonLinks as $knownNonLink) {
@@ -53,17 +58,28 @@ class Rules
 
         if (array_key_exists('host', $parsedUrl) === true) {
             // If it points to a different domain, don't follow.
-            if (stripos($parsedUrl['host'], $this->crawlerConfig->domainName) === false) {
-                // $this->statusWriter->write("Skipping $href as host " . $parsedUrl['host'] . " is different.");
+
+            if (endsWith($parsedUrl['host'], $this->crawlerConfig->domainName) === false) {
+                $this->statusWriter->write("Skipping $href as host " . $parsedUrl['host'] . " is different.");
+
+                if (strpos($parsedUrl['host'], $this->crawlerConfig->domainName) !== false) {
+                    $this->statusWriter->write("*** PROBABLY BORKED " . $parsedUrl['host'] . "");
+                    $this->errorWriter->write(
+                        "Host probably borked: " . $parsedUrl['host'],
+                        "href $href",
+                        "Referrer $referrer"
+                    );
+                }
                 return null;
             }
+
+
+            
             // $this->statusWriter->write("Following absolute URL $href");
             // If it points to same domain, follow.
             return new UrlToCheck($href, $referrer);
         }
 
-        //$this->statusWriter->write("Following relative path $href");
-        
         //It's relative
         return new UrlToCheck(
             $this->crawlerConfig->getPath($href),

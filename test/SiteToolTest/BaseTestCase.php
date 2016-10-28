@@ -26,7 +26,7 @@ class BaseTestCase extends \PHPUnit_Framework_TestCase
             $this->assertEquals(0, 1, "startLevel was not set, cannot complete teardown");
         }
         $contents = ob_get_contents();
-        ob_end_clean();
+        ob_end_flush();
 
         $endLevel = ob_get_level();
         $this->assertEquals($endLevel, $this->startLevel, "Mismatched ob_start/ob_end calls....somewhere");
