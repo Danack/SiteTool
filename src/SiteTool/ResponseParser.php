@@ -4,39 +4,43 @@ namespace SiteTool;
 
 use Zend\EventManager\EventManager;
 use Zend\EventManager\Event;
-use SiteTool\SiteChecker;
-
-use Amp\Artax\Client as ArtaxClient;
 use Amp\Artax\SocketException;
-use Amp\Artax\Response;
 use FluentDOM\Document;
 use FluentDOM\Element;
-use SiteTool\ResultWriter\FileResultWriter;
 use SiteTool\ErrorWriter;
-
-
 
 class ResponseParser
 {
 
-    public function __construct(EventManager $eventManager)
-    {
-        $eventManager->attach(SiteChecker::HTML_RECEIVED, [$this, 'parseResponse']);    
-    }
+    private $errors = 0;
+
+    /** @var \Zend\EventManager\EventManager */
+    private $eventManager;
     
-    public function parseResponse(Event $e)
+    /** @var \SiteTool\ResultWriter  */
+    private $resultWriter;
+    
+    public function __construct(
+        EventManager $eventManager,
+        Rules $rules,
+        ResultWriter $resultWriter
+    ) {
+        $this->rules = $rules;
+        $this->eventManager = $eventManager;
+        $this->resultWriter = $resultWriter;
+        $eventManager->attach(SiteChecker::HTML_RECEIVED, [$this, 'parseResponseEvent']);    
+    }
+
+    /**
+     * @param Event $e
+     */
+    public function parseResponseEvent(Event $e)
     {
+        $params = $e->getParams();
+        $urlToCheck = $params[0];
+        $responseBody = $params[1];
 
-            $event  = $e->getName();
-            $target = get_class($e->getTarget());
-            $params = json_encode($e->getParams());
-
-//            $log->info(sprintf(
-//                '%s called on %s, using params %s',
-//                $event,
-//                $target,
-//                $params
-//            ));
+        $this->parseResponse($urlToCheck, $responseBody);
     }
 
 
@@ -44,24 +48,23 @@ class ResponseParser
      * @param URLToCheck $urlToCheck
      * @param $body
      */
-    function analyzeHtmlBody(URLToCheck $urlToCheck, $body)
+    function parseResponse(URLToCheck $urlToCheck, $body)
     {
         $ok = false;
         $path = $urlToCheck->getUrl();
+
+        // echo "Parsing body for " . $urlToCheck->getUrl() . "\n";
 
         try {
             $document = new Document();
             $body = mb_convert_encoding($body, 'HTML-ENTITIES', 'UTF-8');
             $document->loadHTML($body);
             $linkClosure = function (Element $element) use ($urlToCheck) {
-                $this->parseLinkResult($element, $urlToCheck->getUrl());
+                $href = $element->getAttribute('href');
+                $this->eventManager->trigger(SiteChecker::FOUND_URL, null, [$href, $urlToCheck->getUrl()]);
             };
-//            $imgClosure = function (Element $element) use ($urlToCheck) {
-//                $this->parseImgResult($element, $urlToCheck->getUrl());
-//            };
 
             $document->find('//a')->each($linkClosure);
-            //$document->find('//img')->each($imgClosure);
             $ok = true;
         }
         catch (SocketException $se) {
@@ -98,5 +101,4 @@ class ResponseParser
             $this->errors++;
         }
     }
-    
 }

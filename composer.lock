@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "d60d0d8854be6c8e8e2f4ffb8bb1684a",
+    "hash": "4ea7f403b29a195a794dd11f5fdd340e",
     "packages": [
         {
             "name": "amphp/amp",
@@ -61,7 +61,7 @@
                 "non-blocking",
                 "promise"
             ],
-            "time": "2016-05-12T12:54:59+00:00"
+            "time": "2016-05-12 12:54:59"
         },
         {
             "name": "amphp/artax",
@@ -119,7 +119,7 @@
                 "parallel",
                 "rest"
             ],
-            "time": "2016-08-08T16:27:01+00:00"
+            "time": "2016-08-08 16:27:01"
         },
         {
             "name": "amphp/cache",
@@ -167,7 +167,7 @@
             ],
             "description": "A promise-aware caching API built on the amp concurrency framework",
             "homepage": "https://github.com/amphp/cache",
-            "time": "2015-09-08T22:26:20+00:00"
+            "time": "2015-09-08 22:26:20"
         },
         {
             "name": "amphp/dns",
@@ -235,7 +235,7 @@
                 "dns",
                 "resolve"
             ],
-            "time": "2016-05-26T19:49:36+00:00"
+            "time": "2016-05-26 19:49:36"
         },
         {
             "name": "amphp/file",
@@ -295,7 +295,7 @@
                 "non-blocking",
                 "static"
             ],
-            "time": "2016-10-01T17:43:52+00:00"
+            "time": "2016-10-01 17:43:52"
         },
         {
             "name": "amphp/socket",
@@ -350,7 +350,7 @@
                 "tcp",
                 "tls"
             ],
-            "time": "2016-07-18T22:03:24+00:00"
+            "time": "2016-07-18 22:03:24"
         },
         {
             "name": "danack/aurynconfig",
@@ -396,7 +396,7 @@
                 "config",
                 "di"
             ],
-            "time": "2016-10-23T20:13:59+00:00"
+            "time": "2016-10-23 20:13:59"
         },
         {
             "name": "danack/console",
@@ -456,7 +456,7 @@
                 "cli",
                 "console"
             ],
-            "time": "2015-01-23T14:07:48+00:00"
+            "time": "2015-01-23 14:07:48"
         },
         {
             "name": "danack/tier",
@@ -511,7 +511,7 @@
                 "di",
                 "example"
             ],
-            "time": "2016-10-23T21:09:04+00:00"
+            "time": "2016-10-23 21:09:04"
         },
         {
             "name": "daverandom/libdns",
@@ -544,7 +544,7 @@
             "keywords": [
                 "dns"
             ],
-            "time": "2016-04-29T20:47:45+00:00"
+            "time": "2016-04-29 20:47:45"
         },
         {
             "name": "fluentdom/fluentdom",
@@ -594,7 +594,7 @@
                 "jquery",
                 "xml"
             ],
-            "time": "2015-07-07T13:34:07+00:00"
+            "time": "2015-07-07 13:34:07"
         },
         {
             "name": "psr/http-message",
@@ -644,7 +644,7 @@
                 "request",
                 "response"
             ],
-            "time": "2016-08-06T14:39:51+00:00"
+            "time": "2016-08-06 14:39:51"
         },
         {
             "name": "rdlowrey/auryn",
@@ -705,7 +705,7 @@
                 "dic",
                 "ioc"
             ],
-            "time": "2016-03-14T20:10:19+00:00"
+            "time": "2016-03-14 20:10:19"
         },
         {
             "name": "zendframework/zend-diactoros",
@@ -755,7 +755,61 @@
                 "psr",
                 "psr-7"
             ],
-            "time": "2016-10-11T13:25:21+00:00"
+            "time": "2016-10-11 13:25:21"
+        },
+        {
+            "name": "zendframework/zend-eventmanager",
+            "version": "3.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/zendframework/zend-eventmanager.git",
+                "reference": "5c80bdee0e952be112dcec0968bad770082c3a6e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/zendframework/zend-eventmanager/zipball/5c80bdee0e952be112dcec0968bad770082c3a6e",
+                "reference": "5c80bdee0e952be112dcec0968bad770082c3a6e",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.5 || ^7.0"
+            },
+            "require-dev": {
+                "athletic/athletic": "^0.1",
+                "container-interop/container-interop": "^1.1.0",
+                "phpunit/phpunit": "~4.0",
+                "squizlabs/php_codesniffer": "^2.0",
+                "zendframework/zend-stdlib": "^2.7.3 || ^3.0"
+            },
+            "suggest": {
+                "container-interop/container-interop": "^1.1.0, to use the lazy listeners feature",
+                "zendframework/zend-stdlib": "^2.7.3 || ^3.0, to use the FilterChain feature"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.0-dev",
+                    "dev-develop": "3.1-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Zend\\EventManager\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "description": "Trigger and listen to events within a PHP application",
+            "homepage": "https://github.com/zendframework/zend-eventmanager",
+            "keywords": [
+                "event",
+                "eventmanager",
+                "events",
+                "zf2"
+            ],
+            "time": "2016-02-18 20:53:00"
         }
     ],
     "packages-dev": [
@@ -823,7 +877,7 @@
                 "test double",
                 "testing"
             ],
-            "time": "2014-05-02T12:16:45+00:00"
+            "time": "2014-05-02 12:16:45"
         },
         {
             "name": "nikic/fast-route",
@@ -866,7 +920,7 @@
                 "router",
                 "routing"
             ],
-            "time": "2014-11-26T18:36:25+00:00"
+            "time": "2014-11-26 18:36:25"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -927,7 +981,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2014-09-02T10:13:14+00:00"
+            "time": "2014-09-02 10:13:14"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -974,7 +1028,7 @@
                 "filesystem",
                 "iterator"
             ],
-            "time": "2015-06-21T13:08:43+00:00"
+            "time": "2015-06-21 13:08:43"
         },
         {
             "name": "phpunit/php-text-template",
@@ -1015,7 +1069,7 @@
             "keywords": [
                 "template"
             ],
-            "time": "2015-06-21T13:50:34+00:00"
+            "time": "2015-06-21 13:50:34"
         },
         {
             "name": "phpunit/php-timer",
@@ -1059,7 +1113,7 @@
             "keywords": [
                 "timer"
             ],
-            "time": "2016-05-12T18:03:57+00:00"
+            "time": "2016-05-12 18:03:57"
         },
         {
             "name": "phpunit/php-token-stream",
@@ -1109,7 +1163,7 @@
             "keywords": [
                 "tokenizer"
             ],
-            "time": "2014-03-03T05:10:30+00:00"
+            "time": "2014-03-03 05:10:30"
         },
         {
             "name": "phpunit/phpunit",
@@ -1182,7 +1236,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2014-10-17T09:04:17+00:00"
+            "time": "2014-10-17 09:04:17"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
@@ -1231,7 +1285,7 @@
                 "mock",
                 "xunit"
             ],
-            "time": "2013-01-13T10:24:48+00:00"
+            "time": "2013-01-13 10:24:48"
         },
         {
             "name": "room11/caching",
@@ -1276,7 +1330,7 @@
                 "interface",
                 "room11"
             ],
-            "time": "2015-08-22T20:09:34+00:00"
+            "time": "2015-08-22 20:09:34"
         },
         {
             "name": "room11/http",
@@ -1321,7 +1375,7 @@
                 "interface",
                 "room11"
             ],
-            "time": "2016-04-06T22:59:17+00:00"
+            "time": "2016-04-06 22:59:17"
         },
         {
             "name": "squizlabs/php_codesniffer",
@@ -1399,7 +1453,7 @@
                 "phpcs",
                 "standards"
             ],
-            "time": "2016-09-01T23:53:02+00:00"
+            "time": "2016-09-01 23:53:02"
         },
         {
             "name": "symfony/yaml",
@@ -1448,7 +1502,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2016-10-21T20:59:10+00:00"
+            "time": "2016-10-21 20:59:10"
         }
     ],
     "aliases": [],

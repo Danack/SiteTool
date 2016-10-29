@@ -10,7 +10,8 @@ use FluentDOM\Element;
 use SiteTool\ResultWriter\FileResultWriter;
 use SiteTool\ErrorWriter;
 use Zend\EventManager\EventManager;
-
+use Zend\EventManager\Event;
+use SiteTool\Rules; 
 
 
 class SiteChecker
@@ -18,9 +19,14 @@ class SiteChecker
     const HTTP_RESPONSE     = 'http_response';
     const HTML_RECEIVED     = 'html_received';
     const FOUND_HREF        = 'found_href';
-    const FOUND_URL_TO_SCAN = 'found_url_to_scan';
+
+    const FOUND_URL         = 'found_url';
+    const FOUND_URL_TO_FOLLOW = 'found_url_to_scan';
     const REQUEST_ERROR     = 'request_error';
     const PARSING_ERROR     = 'parsing_error';
+    
+    
+    const SKIPPING_LINK_DUE_TO_DOMAIN = 'skipping_link_due_to_domain';
     
     /** @var URLToCheck[] */
     private $urlsToCheck = [];
@@ -58,22 +64,26 @@ class SiteChecker
         StatusWriter $statusWriter,
         ErrorWriter $errorWriter,
         EventManager $eventManager,
+        Rules $rules,
+        ContentTypeEventList $contentTypeEvent,
         $maxCount
     ) {
         $this->crawlerConfig = $crawlerConfig;
         $this->artaxClient = $artaxClient;
-        $this->rules = new Rules($crawlerConfig, $statusWriter, $errorWriter);
+        $this->rules = $rules;
         $this->resultWriter = $resultWriter;
         $this->statusWriter = $statusWriter;
         $this->errorWriter = $errorWriter;
         $this->eventManager = $eventManager;
         $this->maxCount = $maxCount;
-        
-        // This is nice.
+        $this->contentTypeEvent = $contentTypeEvent;
+
+        // This is fine.
         libxml_use_internal_errors(true);
+
+        $eventManager->attach(SiteChecker::FOUND_URL_TO_FOLLOW, [$this, 'followURLEvent']);
     }
-    
-    
+
 
     /**
      * @param \Exception $e
@@ -128,59 +138,8 @@ class SiteChecker
                 return null;
             }
         }
-    
-        $this->analyzeResponse($response, $urlToCheck);
-    }
 
-    /**
-     * @param Response $response
-     * @param UrlToCheck $urlToCheck
-     * @return null
-     * @throws \Exception
-     */
-    public function analyzeResponse(Response $response, UrlToCheck $urlToCheck)
-    {
-        $contentTypeHeaders = $response->getHeader('Content-Type');
-
-        if (array_key_exists(0, $contentTypeHeaders) == false) {
-            throw new \Exception("Content-type header not set.");
-        }
-
-        $contentType = $contentTypeHeaders[0];
-        $colonPosition = strpos($contentType, ';');
-
-        if ($colonPosition !== false) {
-            $contentType = substr($contentType, 0, $colonPosition);
-        }
-
-        switch ($contentType) {
-            case ('text/html'): {
-                $this->analyzeHtmlBody($urlToCheck, $response->getBody());
-
-                $this->eventManager->trigger(SiteChecker::HTML_RECEIVED, $urlToCheck, $response->getBody())
-                break;
-            }
-
-            case ('text/plain'): {
-                return null;
-                break;
-            }
-
-            case ('application/octet-stream') :
-            case ('image/gif') :
-            case ('image/jpeg') :
-            case ('image/jpg') :
-            case ('image/vnd.adobe.photoshop') :
-            case ('image/png') :
-            case ('application/atom+xml') : {
-                return null;
-            }
-
-            default: {
-                // throw new \Exception("Unrecognised content-type $contentType");
-                echo "Unrecognised content-type $contentType";
-            }
-        }
+        $this->contentTypeEvent->triggerEventForContent($response, $urlToCheck);
     }
 
     function getErrorCount()
@@ -189,69 +148,48 @@ class SiteChecker
     }
 
     /**
+     * @param Event $e
+     */
+    public function followURLEvent(Event $e)
+    {
+        $params = $e->getParams();
+        $this->followURL($params[0]);
+    }
+
+    /**
      * @param URLToCheck $urlToCheck
      */
     function fetchURL(URLToCheck $urlToCheck)
     {
         $fullURL = $urlToCheck->getUrl();
-        $this->statusWriter->write("Adding $fullURL from referrer " . $urlToCheck->getReferrer());
+        $this->statusWriter->write("Fetching $fullURL from referrer " . $urlToCheck->getReferrer());
         $promise = $this->artaxClient->request($fullURL);
 
         $analyzeResult = function(
             \Exception $e = null,
             Response $response = null
         ) use ($urlToCheck, $fullURL) {
-            $this->statusWriter->write("Getting $fullURL");
+            $this->statusWriter->write("Got $fullURL");
             return $this->analyzeResult($e, $response, $urlToCheck, $fullURL);
         };
 
         $promise->when($analyzeResult);
-    }
 
-    /**
-     * @param Element $element
-     * @param $referrer
-     */
-    function parseLinkResult(Element $element, $referrer)
-    {
-        $href = $element->getAttribute('href');
-
-        $this->addLinkToProcess($href, $referrer);
-    }
-
-    /**
-     * @param Element $element
-     * @param $referrer
-     */
-    function parseImgResult(Element $element, $referrer)
-    {
-        $href = $element->getAttribute('src');
-        $this->addLinkToProcess($href, $referrer);
-    }
-
-    /**
-     * @param $href
-     * @param $referrer
-     */
-    function addLinkToProcess($href, $referrer)
-    {
-        $urlToCheck = $this->rules->getUrlToCheck($href, $referrer);
-        if (!$urlToCheck) {
-            return;
-        }
-        $this->checkURL($urlToCheck);
+        return $promise;
     }
 
     /**
      * @param URLToCheck $urlToCheck
      */
-    function checkURL(URLToCheck $urlToCheck)
+    public function followURL(URLToCheck $urlToCheck)
     {
-        $url = $urlToCheck->getUrl();
-        if (array_key_exists($url, $this->urlsToCheck)) {
-            return;
-        }
         
+        $url = $urlToCheck->getUrl();
+        if (array_key_exists($url, $this->urlsToCheck) === true) {
+            // echo "Already followed $url \n";
+            return null;
+        }
+
         $this->count++;
         if ($this->count > $this->maxCount) {
             $message = sprintf(
@@ -265,8 +203,6 @@ class SiteChecker
         }
 
         $this->urlsToCheck[$url] = null;
-        $this->fetchURL($urlToCheck);
+        return $this->fetchURL($urlToCheck);
     }
-
-
 }

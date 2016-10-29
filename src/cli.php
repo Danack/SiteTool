@@ -4,7 +4,12 @@ use Auryn\Injector;
 use Tier\TierCLIApp;
 use Tier\CLIFunction;
 
+use SiteTool\ErrorWriter;
+use SiteTool\ErrorWriter\FileErrorWriter;
+
+
 ini_set('display_errors', 'on');
+error_reporting(E_ALL);
 
 require_once(__DIR__.'/../vendor/autoload.php');
 
@@ -26,4 +31,21 @@ $tierApp = new TierCLIApp($injector);
 define('TIER_ROUTING', 10);
 
 $tierApp->addExecutable(TIER_ROUTING, 'Tier\Bridge\ConsoleRouter::routeCommand');
-$tierApp->execute();
+
+
+try {
+    $tierApp->execute();
+}
+
+catch (\Exception $e) {
+    
+    echo $e->getMessage() . "\n";
+    echo $e->getTraceAsString();
+    echo "\n";
+    
+    while(($e = $e->getPrevious()) !== null) {
+        echo "Previouly:\n";
+        echo $e->getTraceAsString();
+        echo "\n";
+    }
+}

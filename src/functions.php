@@ -34,11 +34,12 @@ function createApplication()
     
     $crawlerCommand = new Command('site:crawl', 'SiteTool\Crawler::run');
     $crawlerCommand->setDescription("Crawls a site");
-    $crawlerCommand->addArgument('domainName', InputArgument::REQUIRED, 'The domain name to be crawled');
+    $crawlerCommand->addArgument('initialUrl', InputArgument::REQUIRED, 'The initialUrl to be crawled');
     $crawlerCommand->addOption('jobs', 'j', InputOption::VALUE_OPTIONAL, "How many requests to make at once to a domain", 4);
+    $crawlerCommand->addOption('debug', 'd', InputOption::VALUE_OPTIONAL, "Whether to debug an exception", false);
     $application->add($crawlerCommand);
 
-    
+
     $migrateCheckCommand = new Command('site:migratecheck', 'SiteTool\MigrateCheck::run');
     $migrateCheckCommand->setDescription("Check that all the urls from an old site are migrated to a new domain correctly.");
     $migrateCheckCommand->addArgument('oldDomainName', InputArgument::REQUIRED, 'The old domain name to be crawled');

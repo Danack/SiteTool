@@ -5,21 +5,38 @@ namespace SiteTool;
 
 use SiteTool\StatusWriter;
 use SiteTool\ErrorWriter;
+use Zend\EventManager\EventManager;
+use Zend\EventManager\Event;
 
 class Rules
 {
+    /** @var CrawlerConfig  */
     private $crawlerConfig;
 
+    /** @var StatusWriter  */
     private $statusWriter;
-    
+
     public function __construct(
         CrawlerConfig $crawlerConfig,
+        EventManager $eventManager,
         StatusWriter $statusWriter,
         ErrorWriter $errorWriter
     ) {
         $this->crawlerConfig = $crawlerConfig;
         $this->statusWriter = $statusWriter;
         $this->errorWriter = $errorWriter;
+        $this->eventManager = $eventManager;
+        $this->eventManager->attach(SiteChecker::FOUND_URL, [$this, 'foundUrlEvent']);
+    }
+
+    public function foundUrlEvent(Event $event)
+    {
+        $params = $event->getParams();
+        $href = $params[0];
+        $referrer = $params[1];
+        //echo "Received FOUND_URL with $href, $referrer \n";
+        
+        $this->getUrlToCheck($href, $referrer);
     }
 
     /**
@@ -41,11 +58,11 @@ class Rules
         
         foreach ($knownNonLinks as $knownNonLink) {
             if (stripos($href, $knownNonLink) === 0) {
-                /// $this->statusWriter->write("skipping known non-link $knownNonLink");
+                $this->statusWriter->write("skipping known non-link $knownNonLink");
                 return null;
             }
         }
-        
+
         if (strpos($href, '//') === 0) {
             $href = sprintf("%s://%s",
                 $this->crawlerConfig->schema, // todo, should be schema of referer
@@ -53,15 +70,18 @@ class Rules
             );
         }
 
-        
         $parsedUrl = parse_url($href);
 
         if (array_key_exists('host', $parsedUrl) === true) {
             // If it points to a different domain, don't follow.
 
             if (endsWith($parsedUrl['host'], $this->crawlerConfig->domainName) === false) {
-                $this->statusWriter->write("Skipping $href as host " . $parsedUrl['host'] . " is different.");
-
+                //$this->statusWriter->write("Skipping $href as host " . $parsedUrl['host'] . " is different.");
+                $this->eventManager->trigger(
+                    SiteChecker::SKIPPING_LINK_DUE_TO_DOMAIN,
+                    null,
+                    [$href, $parsedUrl['host']]
+                );
                 if (strpos($parsedUrl['host'], $this->crawlerConfig->domainName) !== false) {
                     $this->statusWriter->write("*** PROBABLY BORKED " . $parsedUrl['host'] . "");
                     $this->errorWriter->write(
@@ -70,27 +90,27 @@ class Rules
                         "Referrer $referrer"
                     );
                 }
-                return null;
+
+                return;
             }
 
-
-            
             // $this->statusWriter->write("Following absolute URL $href");
             // If it points to same domain, follow.
-            return new UrlToCheck($href, $referrer);
+            $urlToCheck = new UrlToCheck($href, $referrer);
+            //echo "FOUND_URL_TO_FOLLOW, $href \n";
+            $this->eventManager->trigger(SiteChecker::FOUND_URL_TO_FOLLOW, null, [$urlToCheck]);
         }
 
         //It's relative
-        return new UrlToCheck(
+        $urlToCheck = new UrlToCheck(
             $this->crawlerConfig->getPath($href),
             $referrer
         );
+        
+        //echo "FOUND_URL_TO_FOLLOW, $href \n";
+        $this->eventManager->trigger(SiteChecker::FOUND_URL_TO_FOLLOW, null, [$urlToCheck]);
     }
-    
-    
-//    PHP_URL_SCHEME, PHP_URL_HOST, PHP_URL_PORT, PHP_URL_USER, PHP_URL_PASS, PHP_URL_PATH, PHP_URL_QUERY or PHP_URL_FRAGMENT to retrieve just a specific URL component as a string (except when PHP_URL_PORT
-    
-    
+
     public function shouldFollow($fullURL)
     {
         if (strpos($fullURL, '/queueinfo') !== false) {
@@ -99,12 +119,5 @@ class Rules
 
         return true;
     }
-    
-    public function shouldFollowURLToCheck(URLToCheck $urlToCheck)
-    {
-        echo " url is ". $urlToCheck->getUrl();
-        
-        exit(0);
-    }
 }
-        
+

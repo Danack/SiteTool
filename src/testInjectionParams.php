@@ -17,8 +17,9 @@ $shares = [
 // Alias interfaces (or classes) to the actual types that should be used 
 // where they are required. 
 $aliases = [
-    SiteTool\StatusWriter::class => SiteTool\StatusWriter\NullStatusWriter::class,
-    SiteTool\ErrorWriter::class => SiteTool\ErrorWriter\NullErrorWriter::class,
+    SiteTool\StatusWriter::class => SiteTool\StatusWriter\StdoutStatusWriter::class,
+    //SiteTool\ResultWriter::class => SiteTool\ResultWriter\FileResultWriter::class,
+    SiteTool\ResultReader::class => SiteTool\ResultReader\StandardResultReader::class,
 ];
 
 // Delegate the creation of types to callables.

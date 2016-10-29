@@ -1,0 +1,12 @@
+{
+    "methodCalls": [
+        {
+            "class": "\\Auryn\\Injector",
+            "method": "make",
+            "position": 0
+        }
+    ],
+    "functionCalls": [
+    ]
+}
+
