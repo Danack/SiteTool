@@ -34,8 +34,6 @@ class Rules
         $params = $event->getParams();
         $href = $params[0];
         $referrer = $params[1];
-        //echo "Received FOUND_URL with $href, $referrer \n";
-        
         $this->getUrlToCheck($href, $referrer);
     }
 
@@ -74,7 +72,6 @@ class Rules
 
         if (array_key_exists('host', $parsedUrl) === true) {
             // If it points to a different domain, don't follow.
-
             if (endsWith($parsedUrl['host'], $this->crawlerConfig->domainName) === false) {
                 //$this->statusWriter->write("Skipping $href as host " . $parsedUrl['host'] . " is different.");
                 $this->eventManager->trigger(
@@ -97,7 +94,6 @@ class Rules
             // $this->statusWriter->write("Following absolute URL $href");
             // If it points to same domain, follow.
             $urlToCheck = new UrlToCheck($href, $referrer);
-            //echo "FOUND_URL_TO_FOLLOW, $href \n";
             $this->eventManager->trigger(SiteChecker::FOUND_URL_TO_FOLLOW, null, [$urlToCheck]);
         }
 
@@ -107,7 +103,6 @@ class Rules
             $referrer
         );
         
-        //echo "FOUND_URL_TO_FOLLOW, $href \n";
         $this->eventManager->trigger(SiteChecker::FOUND_URL_TO_FOLLOW, null, [$urlToCheck]);
     }
 

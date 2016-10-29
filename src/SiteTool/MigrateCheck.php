@@ -84,13 +84,19 @@ class MigrateCheck
 
         return null;
     }
-    
+
+    /**
+     * 
+     */
     public function run()
     {
         \Amp\run([$this, 'check']);
         echo "Completed with " . $this->errorCount . " errors";
     }
-        
+
+    /**
+     * 
+     */
     public function check()
     {
         $results = $this->resultReader->readAll();

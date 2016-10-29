@@ -27,18 +27,13 @@ function createArtaxClient($jobs)
 function createApplication()
 {
     $application = new Application("SiteTool", "1.0.0");
-
-    $statsCommand = new Command('hello:world', 'SiteTool\HelloWorld::run');
-    $statsCommand->setDescription("Hello world test.");
-    $application->add($statsCommand);
     
     $crawlerCommand = new Command('site:crawl', 'SiteTool\Crawler::run');
     $crawlerCommand->setDescription("Crawls a site");
     $crawlerCommand->addArgument('initialUrl', InputArgument::REQUIRED, 'The initialUrl to be crawled');
     $crawlerCommand->addOption('jobs', 'j', InputOption::VALUE_OPTIONAL, "How many requests to make at once to a domain", 4);
-    $crawlerCommand->addOption('debug', 'd', InputOption::VALUE_OPTIONAL, "Whether to debug an exception", false);
+    // $crawlerCommand->addOption('debug', 'd', InputOption::VALUE_OPTIONAL, "Whether to debug an exception", false);
     $application->add($crawlerCommand);
-
 
     $migrateCheckCommand = new Command('site:migratecheck', 'SiteTool\MigrateCheck::run');
     $migrateCheckCommand->setDescription("Check that all the urls from an old site are migrated to a new domain correctly.");
@@ -64,4 +59,59 @@ function endsWith($haystack, $needle)
     }
 
     return (substr($haystack, -$length) === $needle);
+}
+
+function createFileErrorWriter($errorFilename = null) {
+
+    if ($errorFilename === null) {
+        $errorFilename = "error.txt";
+    }
+
+    return new SiteTool\ErrorWriter\FileErrorWriter($errorFilename);
+}
+
+function createFileResultWriter($resultFilename = null)
+{
+    
+    
+    
+    if ($resultFilename === null) {
+        $resultFilename = "error.txt";
+    }
+
+    return new SiteTool\ResultWriter\FileResultWriter($resultFilename);
+}
+
+
+function createCrawlerConfig($initialUrl)
+{
+    $urlParts = parse_url($initialUrl);
+    if (array_key_exists('host', $urlParts) === false) {
+        echo "Could not determine domain name from " . $initialUrl . "\n";
+        exit(-1);
+    }
+
+    $domainName = $urlParts['host'];
+    $initialPath = '/';
+
+    if (array_key_exists('host', $urlParts) === true) {
+        $initialPath = $urlParts['path'];
+    }
+
+    return new SiteTool\CrawlerConfig(
+        'http',
+        $domainName,
+        $initialPath
+    );
+}
+
+function createStandardResultReader($resultFilename = null)
+{
+    if ($resultFilename === null) {
+        $resultFilename = 'output.txt';
+    }
+    
+    
+
+    return new \SiteTool\ResultReader\StandardResultReader($resultFilename);
 }

@@ -11,7 +11,6 @@ use SiteTool\ErrorWriter;
 
 class ResponseParser
 {
-
     private $errors = 0;
 
     /** @var \Zend\EventManager\EventManager */
@@ -43,7 +42,6 @@ class ResponseParser
         $this->parseResponse($urlToCheck, $responseBody);
     }
 
-
     /**
      * @param URLToCheck $urlToCheck
      * @param $body
@@ -52,7 +50,6 @@ class ResponseParser
     {
         $ok = false;
         $path = $urlToCheck->getUrl();
-
         // echo "Parsing body for " . $urlToCheck->getUrl() . "\n";
 
         try {
@@ -78,17 +75,6 @@ class ResponseParser
         }
         catch(\InvalidArgumentException $iae) {
             $message = "Fluent dom exception on $path - ".$iae->getMessage(). " Exception type is ".get_class($iae);
-            $this->resultWriter->write(
-                $path,
-                500,
-                $urlToCheck->getReferrer(),
-                $message
-            );
-        }
-        catch(\Exception $e) {
-            $message = "Error getting $path - " . $e->getMessage() . " Exception type is " . get_class($e);
-            $message .= $e->getTraceAsString();
-
             $this->resultWriter->write(
                 $path,
                 500,

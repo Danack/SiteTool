@@ -5,7 +5,6 @@ namespace SiteTool;
 
 class CrawlerConfig
 {
-
     public $schema = 'http';
     public $domainName;
     public $path = '/';
