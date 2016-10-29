@@ -28,7 +28,7 @@ class StandardResultReader implements ResultReader
             $parts = explode(',', $line);
             $results[] = new Result(
                 trim($parts[0]),
-                trim($parts[1]),
+                intval(trim($parts[1])),
                 trim($parts[2])
             );
         }

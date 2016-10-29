@@ -18,6 +18,7 @@ class SiteChecker
 {
     const HTTP_RESPONSE     = 'http_response';
     const HTML_RECEIVED     = 'html_received';
+    const RESPONSE_RECEIVED = 'response_received';
     const FOUND_HREF        = 'found_href';
 
     const FOUND_URL         = 'found_url';

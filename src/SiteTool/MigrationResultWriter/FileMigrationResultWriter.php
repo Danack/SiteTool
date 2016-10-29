@@ -1,22 +1,16 @@
 <?php
 
-namespace SiteTool\ResultWriter;
+namespace SiteTool\MigrationResultWriter;
 
-use SiteTool\ResultWriter;
+use SiteTool\MigrationResultWriter;
 use SiteTool\SiteToolException;
 
-
-
-
-class FileResultWriter implements ResultWriter
+class FileMigrationResultWriter implements MigrationResultWriter
 {
     private $fileHandle;
     
     public function __construct($filename)
     {
-        echo "Filename is $filename ";
-        var_dump($filename);
-        
         $this->fileHandle = fopen($filename, "w");
         if ($this->fileHandle === false) {
             throw new SiteToolException("Failed to open $filename for writing.");
@@ -28,7 +22,6 @@ class FileResultWriter implements ResultWriter
         if ($this->fileHandle) {
             fclose($this->fileHandle);
         }
-        echo  "should be closed.\n";
     }
 
     public function write($string, ...$otherStrings)

@@ -39,6 +39,7 @@ function createApplication()
     $migrateCheckCommand->setDescription("Check that all the urls from an old site are migrated to a new domain correctly.");
     $migrateCheckCommand->addArgument('oldDomainName', InputArgument::REQUIRED, 'The old domain name to be crawled');
     $migrateCheckCommand->addArgument('newDomainName', InputArgument::REQUIRED, 'The new domain name to be crawled');
+    $migrateCheckCommand->addOption('jobs', 'j', InputOption::VALUE_OPTIONAL, "How many requests to make at once to a domain", 4);
     $application->add($migrateCheckCommand);
 
     return $application;
@@ -72,14 +73,29 @@ function createFileErrorWriter($errorFilename = null) {
 
 function createFileResultWriter($resultFilename = null)
 {
-    
-    
-    
     if ($resultFilename === null) {
-        $resultFilename = "error.txt";
+        $resultFilename = "output.txt";
     }
 
     return new SiteTool\ResultWriter\FileResultWriter($resultFilename);
+}
+
+function createFileMigrationResultWriter($resultFilename = null)
+{
+    if ($resultFilename === null) {
+        $resultFilename = 'migration_result.txt';
+    }
+
+    return new SiteTool\MigrationResultWriter\FileMigrationResultWriter($resultFilename);
+}
+
+function createStandardResultReader($resultFilename = null)
+{
+    if ($resultFilename === null) {
+        $resultFilename = 'output.txt';
+    }
+
+    return new \SiteTool\ResultReader\StandardResultReader($resultFilename);
 }
 
 
@@ -103,15 +119,4 @@ function createCrawlerConfig($initialUrl)
         $domainName,
         $initialPath
     );
-}
-
-function createStandardResultReader($resultFilename = null)
-{
-    if ($resultFilename === null) {
-        $resultFilename = 'output.txt';
-    }
-    
-    
-
-    return new \SiteTool\ResultReader\StandardResultReader($resultFilename);
 }

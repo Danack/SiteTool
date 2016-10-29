@@ -2,12 +2,14 @@
 
 namespace SiteTool;
 
+use Auryn\Injector;
 use SiteTool\ResultReader;
 use Amp\Artax\Client as ArtaxClient;
 use Amp\Artax\Response;
-use SiteTool\ResultWriter\FileResultWriterFactory;
-use SiteTool\StatusWriter\StdoutStatusWriter;
-use SiteTool\ResultReader\StandardResultReader;
+use SiteTool\MigrationResultWriter\FileMigrationResultWriter;
+use SiteTool\StatusWriter;
+use Zend\EventManager\EventManager;
+use SiteTool\ErrorWriter;
 
 class MigrateCheck
 {
@@ -20,30 +22,50 @@ class MigrateCheck
     /** @var StatusWriter  */
     private $statusWriter;
 
+    /** @var FileMigrationResultWriter */
+    private $fileMigrationResultWriter;
+    
+    /** @var ErrorWriter */
+    private $errorWriter;
+    
     /**
      * @var ArtaxClient
      */
     private $artaxClient;
-    
-    private $errorCount;
+
+    /** @var \Zend\EventManager\EventManager */
+    private $eventManager;
     
     public function __construct(
         $oldDomainName,
         $newDomainName,
-        //ResultReader $resultReader,
+        ResultReader $resultReader,
         ArtaxClient $artaxClient,
-        FileResultWriterFactory $fileResultWriterFactory
+        StatusWriter $statusWriter,
+        FileMigrationResultWriter $fileMigrationResultWriter,
+        ErrorWriter $errorWriter,
+        EventManager $eventManager
     ) {
         $this->oldDomainName = $oldDomainName; 
         $this->newDomainName = $newDomainName;
-        $this->resultReader = //$resultReader;
-        
-        new StandardResultReader('output.txt');
-        
+        $this->resultReader = $resultReader;
+        $this->eventManager = $eventManager;
+        $this->errorWriter = $errorWriter;
+
         $this->artaxClient = $artaxClient;
-        $this->resultWriter = $fileResultWriterFactory->create("migrate_check.txt");
-        $this->statusWriter = new StdoutStatusWriter();
+        $this->fileMigrationResultWriter = $fileMigrationResultWriter;
+        $this->statusWriter = $statusWriter;
     }
+
+    /**
+     * 
+     */
+    public function run(Injector $injector)
+    {
+        $plugins[] = $injector->make(\SiteTool\MigrateCheckOkStatus::class);
+        \Amp\run([$this, 'check']);
+    }
+
 
     /**
      * @param \Exception $e
@@ -53,45 +75,23 @@ class MigrateCheck
     public function analyzeResult(\Exception $e = null, Response $response = null, $fullURL)
     {
         if ($e) {
-            $this->handleException($e, $response, $fullURL);
+            $message = "Something went wrong for $fullURL : " . $e->getMessage();
+            if ($response) {
+                $message .= "Headers " . var_export($response->getAllHeaders(), true);
+            }
+            $this->statusWriter->write($message);
+            $this->errorWriter->write($message);
             return;
         }
 
-        $status = $response->getStatus();
-        if ($status === 200) {
-            $this->statusWriter->write("URL $fullURL is 200 ok");
+        if ($response === null) {
+            $message = "Failed to read response for $fullURL";
+            $this->statusWriter->write($message);
+            $this->errorWriter->write($message);
             return;
         }
-        $this->statusWriter->write("URL $fullURL is status $status");
-        $this->errorCount++;
-        $this->resultWriter->write($status, $fullURL);
-    }
 
-    /**
-     * @param \Exception $e
-     * @param Response $response
-     * @param $fullURL
-     * @return null
-     */
-    function handleException(\Exception $e, Response $response = null, $fullURL)
-    {
-        $message = "Something went wrong for $fullURL : " . $e->getMessage();
-        if ($response) {
-            $message .= "Headers " . var_export($response->getAllHeaders(), true);
-        }
-        $this->statusWriter->write($message);
-        $this->errorCount++;
-
-        return null;
-    }
-
-    /**
-     * 
-     */
-    public function run()
-    {
-        \Amp\run([$this, 'check']);
-        echo "Completed with " . $this->errorCount . " errors";
+        $this->eventManager->trigger(SiteChecker::RESPONSE_RECEIVED, null, [$response, $fullURL]);
     }
 
     /**
@@ -100,10 +100,13 @@ class MigrateCheck
     public function check()
     {
         $results = $this->resultReader->readAll();
-
         foreach ($results as $result) {
+            if ($result->status != 200) {
+                continue;
+            }
+
             $newUrl = str_replace($this->oldDomainName, $this->newDomainName, $result->url);
-            echo $newUrl . " \n";
+            $this->statusWriter->write("Checking $newUrl");
             $promise = $this->artaxClient->request($newUrl);
 
             $analyzeResult = function(

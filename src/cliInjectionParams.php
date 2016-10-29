@@ -12,9 +12,13 @@ $shares = [
     SiteTool\ResultWriter::class,
     Zend\EventManager\EventManager::class,
     SiteTool\CrawlerConfig::class,
+    SiteTool\StatusWriter::class,
+    SiteTool\ErrorWriter\FileErrorWriter::class,
     SiteTool\ErrorWriter\FileErrorWriter::class,
     SiteTool\ResultWriter\FileResultWriter::class,
-    SiteTool\StatusWriter::class,
+    SiteTool\ResultWriter\FileResultWriter::class,
+    SiteTool\CrawlerConfig::class,
+    SiteTool\ResultReader\StandardResultReader::class
 ];
 
 // Alias interfaces (or classes) to the actual types that should be used 
@@ -23,7 +27,8 @@ $aliases = [
     SiteTool\StatusWriter::class => SiteTool\StatusWriter\StdoutStatusWriter::class,
     SiteTool\ErrorWriter::class => SiteTool\ErrorWriter\FileErrorWriter::class,
     SiteTool\ResultWriter::class => SiteTool\ResultWriter\FileResultWriter::class,
-    SiteTool\ResultReader::class => SiteTool\ResultReader\StandardResultReader::class
+    SiteTool\ResultReader::class => SiteTool\ResultReader\StandardResultReader::class,
+    SiteTool\MigrationResultWriter::class => SiteTool\MigrationResultWriter\FileMigrationResultWriter::class,
 ];
 
 // Delegate the creation of types to callables.
@@ -33,6 +38,7 @@ $delegates = [
     SiteTool\ResultWriter\FileResultWriter::class => 'createFileResultWriter',
     SiteTool\CrawlerConfig::class => 'createCrawlerConfig',
     SiteTool\ResultReader\StandardResultReader::class => 'createStandardResultReader',
+    SiteTool\MigrationResultWriter\FileMigrationResultWriter::class => 'createFileMigrationResultWriter',
 ];
 
 // If necessary, define some params per class.

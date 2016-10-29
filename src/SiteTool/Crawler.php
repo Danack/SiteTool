@@ -9,7 +9,6 @@ use SiteTool\ErrorWriter;
 use SiteTool\StatusWriter;
 use Zend\EventManager\EventManager;
 
-
 class Crawler
 {
     public function run(

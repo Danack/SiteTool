@@ -5,8 +5,6 @@ use Tier\TierCLIApp;
 use Tier\CLIFunction;
 
 use SiteTool\ErrorWriter;
-use SiteTool\ErrorWriter\FileErrorWriter;
-
 
 ini_set('display_errors', 'on');
 error_reporting(E_ALL);
@@ -25,20 +23,17 @@ $standardInjectionParams->addToInjector($injector);
 $cliInjectionParams = require __DIR__."/cliInjectionParams.php";
 /** @var $cliInjectionParams \AurynConfig\InjectionParams */
 $cliInjectionParams->addToInjector($injector);
-
 $tierApp = new TierCLIApp($injector);
 
 define('TIER_ROUTING', 10);
 
 $tierApp->addExecutable(TIER_ROUTING, 'Tier\Bridge\ConsoleRouter::routeCommand');
 
-
 try {
     $tierApp->execute();
+    // $injector->execute('Tier\Bridge\ConsoleRouter::routeCommand');
 }
-
 catch (\Exception $e) {
-    
     echo $e->getMessage() . "\n";
     echo $e->getTraceAsString();
     echo "\n";

@@ -9,10 +9,10 @@ class Result
     public $url;
     public $referrer;
 
-    function __construct($status, $url, $referrer)
+    function __construct($url, $status, $referrer)
     {
-        $this->status = $status;
         $this->url = $url;
+        $this->status = $status;
         $this->referrer = $referrer;
     }
 }
