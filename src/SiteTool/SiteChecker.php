@@ -117,8 +117,16 @@ class SiteChecker
             else {
                 $this->outputWriter->write(
                     OutputWriter::PROGRESS | OutputWriter::ERROR,
-                    "Status $status is not OK for " . $urlToCheck->getUrl()
+                    "Status $status is not OK for " . $urlToCheck->getUrl() . " ",
+                    $urlToCheck->getReferrer()
                 );
+                $this->outputWriter->write(
+                    OutputWriter::PROGRESS | OutputWriter::ERROR,
+                    "Status $status is not OK for ",
+                    $urlToCheck->getUrl(),
+                    $urlToCheck->getReferrer()
+                );
+                
                 $this->errors++;
                 return;
             }
