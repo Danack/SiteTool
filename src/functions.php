@@ -25,6 +25,14 @@ function createArtaxClient($jobs)
     return $client;
 }
 
+
+function addOutputOptionsToCommand(Command $command)
+{
+    $command->addOption('statusOutput', null, InputOption::VALUE_OPTIONAL, "Where to send status output. Allowed values null, stdout, stderr, or a filename", 'stdout');
+    $command->addOption('errorOutput', null, InputOption::VALUE_OPTIONAL, "Where to send error output. Allowed values null, stdout, stderr, or a filename", "error.txt");
+}
+
+
 function createApplication()
 {
     $application = new Application("SiteTool", "1.0.0");
@@ -33,21 +41,10 @@ function createApplication()
     $crawlerCommand->setDescription("Crawls a site");
     $crawlerCommand->addArgument('initialUrl', InputArgument::REQUIRED, 'The initialUrl to be crawled');
     $crawlerCommand->addOption('jobs', 'j', InputOption::VALUE_OPTIONAL, "How many requests to make at once to a domain", 4);
+    $crawlerCommand->addOption('crawlOutput', null, InputOption::VALUE_OPTIONAL, "Where to send error output. Allowed values null, stdout, stderr, or a filename", "crawl_result.txt");
     
-    $crawlerCommand->addOption('statusOutput', null, InputOption::VALUE_OPTIONAL, "Where to send status output. Allowed values null, stdout, stderr, file", 'stdout');
-    $crawlerCommand->addOption('errorOutput', null, InputOption::VALUE_OPTIONAL, "Where to send error output. Allowed values null, stdout, stderr, file", 'file');
-    $crawlerCommand->addOption('crawlOutput', null, InputOption::VALUE_OPTIONAL, "Where to send error output. Allowed values null, stdout, stderr, file", 'file');
-    $crawlerCommand->addOption('migrationOutput', null, InputOption::VALUE_OPTIONAL, "Where to send migration output. Allowed values null, stdout, stderr, file", 'file');
-
-    
-//    $statusOutputFilename
-//    $errorOutputFilename
-//    $crawlOutputFilename
-//    $migrationOutputFilename
-    
-    
-    
-    // $crawlerCommand->addOption('debug', 'd', InputOption::VALUE_OPTIONAL, "Whether to debug an exception", false);
+    $crawlerCommand->addOption('migrationOutput', null, InputOption::VALUE_OPTIONAL, "Where to send migration check output. Allowed values null, stdout, stderr, or a filename", 'migration_result.txt');
+    addOutputOptionsToCommand($crawlerCommand);
     $application->add($crawlerCommand);
 
     $migrateCheckCommand = new Command('site:migratecheck', 'SiteTool\MigrateCheck::run');
@@ -56,6 +53,10 @@ function createApplication()
     $migrateCheckCommand->addArgument('newDomainName', InputArgument::REQUIRED, 'The new domain name to be crawled');
     $migrateCheckCommand->addOption('jobs', 'j', InputOption::VALUE_OPTIONAL, "How many requests to make at once to a domain", 4);
     $migrateCheckCommand->addOption('statusOutput', null, InputOption::VALUE_OPTIONAL, "Where to send status output. Allowed values null, stdout, stderr, file", 'stdout');
+    $migrateCheckCommand->addOption('crawlOutput', null, InputOption::VALUE_OPTIONAL, "Where read the crawl result from. Allowed values null, stdout, stderr, file", 'crawl_result.txt');
+    $migrateCheckCommand->addOption('migrationOutput', null, InputOption::VALUE_OPTIONAL, "Where to send migration check output. Allowed values null, stdout, stderr, or a filename", 'migration_result.txt');
+    
+    addOutputOptionsToCommand($migrateCheckCommand, false);
     $application->add($migrateCheckCommand);
 
     return $application;
@@ -77,13 +78,9 @@ function endsWith($haystack, $needle)
     return (substr($haystack, -$length) === $needle);
 }
 
-function createStandardResultReader($resultFilename = null)
+function createStandardResultReader($crawlOutput)
 {
-    if ($resultFilename === null) {
-        $resultFilename = 'output.txt';
-    }
-
-    return new \SiteTool\ResultReader\StandardResultReader($resultFilename);
+    return new \SiteTool\ResultReader\StandardResultReader($crawlOutput);
 }
 
 
@@ -101,58 +98,44 @@ function createFileWriter($filename)
 }
 
 
-function createWriter($outputType, $filename)
+function createWriter($outputTypeOrFilename)
 {
-    switch ($outputType) {
+    switch ($outputTypeOrFilename) {
         case 'null':
             return new \SiteTool\Writer\NullWriter();
         case 'stdout':
             return new SiteTool\Writer\StdoutWriter();
         case 'stderr':
             return new \SiteTool\Writer\StderrWriter();
-        case 'file':
-            return createFileWriter($filename);
     }
 
-    throw new \Exception("Unknown writer type [$outputType]. Known values are: null, stdout, stderr, file.");
+    return createFileWriter($outputTypeOrFilename);
 }
 
-function createStatusWriter($statusOutput, $statusOutputFilename = null)
+function createStatusWriter($statusOutput)
 {
-    $writer = createWriter($statusOutput, $statusOutputFilename);
+    $writer = createWriter($statusOutput);
     
     return new \SiteTool\Writer\StatusWriter($writer);
 }
 
-function createErrorWriter($errorOutput, $errorOutputFilename = null)
+function createErrorWriter($errorOutput)
 {
+    $writer = createWriter($errorOutput);
 
-    if ($errorOutputFilename === null) {
-        $errorOutputFilename = "error.txt";
-    }
-    
-    $writer = createWriter($errorOutput, $errorOutputFilename);
-    
     return new \SiteTool\Writer\ErrorWriter($writer);
 }
 
-function createCrawlResultWriter($crawlOutput, $crawlOutputFilename = null)
+function createCrawlResultWriter($crawlOutput)
 {
-    if ($crawlOutputFilename === null) {
-        $crawlOutputFilename = "crawl_result.txt";
-    }
-    
-    $writer = createWriter($crawlOutput, $crawlOutputFilename);
+    $writer = createWriter($crawlOutput);
 
     return new \SiteTool\Writer\CrawlResultWriter($writer);
 }
 
-function createMigrationResultWriter($migrationOutput, $migrationOutputFilename = null)
+function createMigrationResultWriter($migrationOutput)
 {
-    if ($migrationOutputFilename === null) {
-        $migrationOutputFilename = 'migration_result.txt';
-    }
-    $writer = createWriter($migrationOutput, $migrationOutputFilename);
+    $writer = createWriter($migrationOutput);
 
     return new \SiteTool\Writer\MigrationResultWriter($writer);
 }

@@ -28,10 +28,7 @@ $shares = [
 // Alias interfaces (or classes) to the actual types that should be used 
 // where they are required. 
 $aliases = [
-//    SiteTool\ErrorWriter::class => SiteTool\ErrorWriter\FileErrorWriter::class,
-//    SiteTool\ResultWriter::class => SiteTool\ResultWriter\FileResultWriter::class,
-//    SiteTool\ResultReader::class => SiteTool\ResultReader\StandardResultReader::class,
-//    SiteTool\MigrationResultWriter::class => SiteTool\MigrationResultWriter\FileMigrationResultWriter::class,
+    SiteTool\ResultReader::class => SiteTool\ResultReader\StandardResultReader::class,
     SiteTool\Writer\OutputWriter::class => SiteTool\Writer\OutputWriter\StandardOutputWriter::class,
 ];
 
