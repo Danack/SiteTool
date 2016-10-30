@@ -7,38 +7,45 @@ use AurynConfig\InjectionParams;
 $shares = [
     SiteTool\SiteChecker::class,
     SiteTool\Rules::class,
-    SiteTool\ErrorWriter::class,
-    SiteTool\StatusWriter::class,
-    SiteTool\ResultWriter::class,
+    SiteTool\Writer\CrawlResultWriter::class,
+    SiteTool\Writer\ErrorWriter::class,
+    SiteTool\Writer\OutputWriter::class,
+    SiteTool\Writer\MigrationResultWriter::class,
+    SiteTool\Writer\StatusWriter::class,
+    SiteTool\CrawlerConfig::class,
+    SiteTool\Writer\FileWriter::class,
+    SiteTool\Writer\NullWriter::class,
+    SiteTool\Writer\StderrWriter::class,
+    SiteTool\Writer\StdoutWriter::class,
+    
+    
+    SiteTool\CrawlerConfig::class,
+    SiteTool\ResultReader\StandardResultReader::class,
+
     Zend\EventManager\EventManager::class,
-    SiteTool\CrawlerConfig::class,
-    SiteTool\StatusWriter::class,
-    SiteTool\ErrorWriter\FileErrorWriter::class,
-    SiteTool\ErrorWriter\FileErrorWriter::class,
-    SiteTool\ResultWriter\FileResultWriter::class,
-    SiteTool\ResultWriter\FileResultWriter::class,
-    SiteTool\CrawlerConfig::class,
-    SiteTool\ResultReader\StandardResultReader::class
 ];
 
 // Alias interfaces (or classes) to the actual types that should be used 
 // where they are required. 
 $aliases = [
-    SiteTool\StatusWriter::class => SiteTool\StatusWriter\StdoutStatusWriter::class,
-    SiteTool\ErrorWriter::class => SiteTool\ErrorWriter\FileErrorWriter::class,
-    SiteTool\ResultWriter::class => SiteTool\ResultWriter\FileResultWriter::class,
-    SiteTool\ResultReader::class => SiteTool\ResultReader\StandardResultReader::class,
-    SiteTool\MigrationResultWriter::class => SiteTool\MigrationResultWriter\FileMigrationResultWriter::class,
+//    SiteTool\ErrorWriter::class => SiteTool\ErrorWriter\FileErrorWriter::class,
+//    SiteTool\ResultWriter::class => SiteTool\ResultWriter\FileResultWriter::class,
+//    SiteTool\ResultReader::class => SiteTool\ResultReader\StandardResultReader::class,
+//    SiteTool\MigrationResultWriter::class => SiteTool\MigrationResultWriter\FileMigrationResultWriter::class,
+    SiteTool\Writer\OutputWriter::class => SiteTool\Writer\OutputWriter\StandardOutputWriter::class,
 ];
 
 // Delegate the creation of types to callables.
 $delegates = [
     Danack\Console\Application::class => 'createApplication',
-    SiteTool\ErrorWriter\FileErrorWriter::class => 'createFileErrorWriter',
-    SiteTool\ResultWriter\FileResultWriter::class => 'createFileResultWriter',
+    
     SiteTool\CrawlerConfig::class => 'createCrawlerConfig',
     SiteTool\ResultReader\StandardResultReader::class => 'createStandardResultReader',
-    SiteTool\MigrationResultWriter\FileMigrationResultWriter::class => 'createFileMigrationResultWriter',
+    
+    SiteTool\Writer\ErrorWriter::class => 'createErrorWriter',
+    SiteTool\Writer\CrawlResultWriter::class => 'createCrawlResultWriter',
+    SiteTool\Writer\MigrationResultWriter::class => 'createMigrationResultWriter',
+    SiteTool\Writer\StatusWriter::class => 'createStatusWriter',
 ];
 
 // If necessary, define some params per class.

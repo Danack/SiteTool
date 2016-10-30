@@ -1,38 +1,42 @@
 <?php
 
-namespace SiteTool\ResultWriter;
 
-use SiteTool\ResultWriter;
+namespace SiteTool\Writer;
+
 use SiteTool\SiteToolException;
+use SiteTool\Writer;
 
-
-
-
-class FileResultWriter implements ResultWriter
+class FileWriter implements Writer
 {
-    private $fileHandle;
+    private $fileHandle = null;
+    private $filename;
     
     public function __construct($filename)
     {
-        echo "Filename is $filename ";
-        var_dump($filename);
-        
-        $this->fileHandle = fopen($filename, "w");
-        if ($this->fileHandle === false) {
-            throw new SiteToolException("Failed to open $filename for writing.");
-        }
+        $this->filename = $filename;
     }
 
+    private function init()
+    {
+        if ($this->fileHandle) {
+            return;
+        }
+        $this->fileHandle = fopen($this->filename, "w");
+        if ($this->fileHandle === false) {
+            throw new SiteToolException("Failed to open " . $this->filename . " for writing.");
+        }
+    }
+    
     public function __destruct()
     {
         if ($this->fileHandle) {
             fclose($this->fileHandle);
         }
-        echo  "should be closed.\n";
     }
 
     public function write($string, ...$otherStrings)
     {
+        $this->init();
         $line = $string;
         if (count($otherStrings) !== 0) {
             $line .= ", ";

@@ -3,8 +3,8 @@
 
 namespace SiteTool;
 
-use SiteTool\StatusWriter;
-use SiteTool\ErrorWriter;
+use SiteTool\Writer\StatusWriter;
+use SiteTool\Writer\ErrorWriter;
 use Zend\EventManager\EventManager;
 use Zend\EventManager\Event;
 

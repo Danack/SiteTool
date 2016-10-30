@@ -7,7 +7,8 @@ use Zend\EventManager\Event;
 use Amp\Artax\SocketException;
 use FluentDOM\Document;
 use FluentDOM\Element;
-use SiteTool\ErrorWriter;
+//use SiteTool\ErrorWriter;
+use SiteTool\Writer\CrawlResultWriter;
 
 class ResponseParser
 {
@@ -22,7 +23,7 @@ class ResponseParser
     public function __construct(
         EventManager $eventManager,
         Rules $rules,
-        ResultWriter $resultWriter
+        CrawlResultWriter $resultWriter
     ) {
         $this->rules = $rules;
         $this->eventManager = $eventManager;

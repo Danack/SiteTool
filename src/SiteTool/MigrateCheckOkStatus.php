@@ -6,21 +6,21 @@ namespace SiteTool;
 use Amp\Artax\Response;
 use Zend\EventManager\EventManager;
 use Zend\EventManager\Event;
-use SiteTool\StatusWriter;
-use SiteTool\MigrationResultWriter\FileMigrationResultWriter;
+use SiteTool\Writer\OutputWriter;
 
 class MigrateCheckOkStatus
 {
-    private $migrationResultWriter;
+    //private $migrationResultWriter;
+    
+    /** @var OutputWriter  */
+    private $outputWriter;
     
     public function __construct(
         EventManager $eventManager,
-        StatusWriter $statusWriter,
-        FileMigrationResultWriter $fileMigrationResultWriter
+        OutputWriter $outputWriter
     ) {
-        $this->migrationResultWriter = $fileMigrationResultWriter;
         $eventManager->attach(SiteChecker::RESPONSE_RECEIVED, [$this, 'checkStatusEvent']);
-        $this->statusWriter = $statusWriter;
+        $this->outputWriter = $outputWriter;
     }
 
     public function checkStatusEvent(Event $event)
@@ -33,11 +33,16 @@ class MigrateCheckOkStatus
     {
         $status = $response->getStatus();
         if ($status === 200) {
-            $this->statusWriter->write("URL $fullURL is 200 ok");
-            //$this->migrationResultWriter->write("URL $fullURL is 200 ok");
+            $this->outputWriter->write(
+                OutputWriter::PROGRESS,
+                "URL $fullURL is 200 ok"
+            );
             return;
         }
-        $this->statusWriter->write("URL $fullURL is status $status");
-        $this->migrationResultWriter->write($status, $fullURL);
+
+        $this->outputWriter->write(
+            OutputWriter::PROGRESS | OutputWriter::MIGRATION_RESULT,
+            $status, $fullURL
+        );
     }
 }

@@ -6,10 +6,8 @@ use Auryn\Injector;
 use SiteTool\ResultReader;
 use Amp\Artax\Client as ArtaxClient;
 use Amp\Artax\Response;
-use SiteTool\MigrationResultWriter\FileMigrationResultWriter;
-use SiteTool\StatusWriter;
 use Zend\EventManager\EventManager;
-use SiteTool\ErrorWriter;
+use SiteTool\Writer\OutputWriter;
 
 class MigrateCheck
 {
@@ -18,15 +16,9 @@ class MigrateCheck
     
     /** @var ResultReader  */
     private $resultReader;
-    
-    /** @var StatusWriter  */
-    private $statusWriter;
 
-    /** @var FileMigrationResultWriter */
-    private $fileMigrationResultWriter;
-    
-    /** @var ErrorWriter */
-    private $errorWriter;
+    /** @var OutputWriter */
+    private $outputWriter;
     
     /**
      * @var ArtaxClient
@@ -41,20 +33,15 @@ class MigrateCheck
         $newDomainName,
         ResultReader $resultReader,
         ArtaxClient $artaxClient,
-        StatusWriter $statusWriter,
-        FileMigrationResultWriter $fileMigrationResultWriter,
-        ErrorWriter $errorWriter,
+        OutputWriter $outputWriter,
         EventManager $eventManager
     ) {
         $this->oldDomainName = $oldDomainName; 
         $this->newDomainName = $newDomainName;
         $this->resultReader = $resultReader;
         $this->eventManager = $eventManager;
-        $this->errorWriter = $errorWriter;
-
+        $this->outputWriter = $outputWriter;
         $this->artaxClient = $artaxClient;
-        $this->fileMigrationResultWriter = $fileMigrationResultWriter;
-        $this->statusWriter = $statusWriter;
     }
 
     /**
@@ -79,15 +66,20 @@ class MigrateCheck
             if ($response) {
                 $message .= "Headers " . var_export($response->getAllHeaders(), true);
             }
-            $this->statusWriter->write($message);
-            $this->errorWriter->write($message);
+
+            $this->outputWriter->write(
+                OutputWriter::PROGRESS | OutputWriter::ERROR,
+                $message
+            );
             return;
         }
 
         if ($response === null) {
             $message = "Failed to read response for $fullURL";
-            $this->statusWriter->write($message);
-            $this->errorWriter->write($message);
+            $this->outputWriter->write(
+                OutputWriter::ERROR | OutputWriter::PROGRESS,
+                $message
+            );
             return;
         }
 
@@ -106,7 +98,10 @@ class MigrateCheck
             }
 
             $newUrl = str_replace($this->oldDomainName, $this->newDomainName, $result->url);
-            $this->statusWriter->write("Checking $newUrl");
+            $this->outputWriter->write(
+                OutputWriter::PROGRESS,
+                "Checking $newUrl"
+            );
             $promise = $this->artaxClient->request($newUrl);
 
             $analyzeResult = function(

@@ -5,9 +5,9 @@ namespace SiteTool;
 
 use Zend\EventManager\EventManager;
 use Zend\EventManager\Event;
-use SiteTool\StatusWriter;
+use SiteTool\Writer\StatusWriter;
 
-class SkippingStatusWriter
+class SkippingLinkWatcher
 {
     private $skippedHrefs = [];
     

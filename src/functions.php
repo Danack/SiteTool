@@ -1,11 +1,12 @@
 <?php
 
 use Amp\Artax\Client as ArtaxClient;
+use Auryn\Injector;
 use Danack\Console\Application;
 use Danack\Console\Command\Command;
 use Danack\Console\Input\InputArgument;
 use Danack\Console\Input\InputOption;
-
+use SiteTool\StatusWriter;
 
 function getRawCharacters($result)
 {
@@ -27,11 +28,25 @@ function createArtaxClient($jobs)
 function createApplication()
 {
     $application = new Application("SiteTool", "1.0.0");
-    
+
     $crawlerCommand = new Command('site:crawl', 'SiteTool\Crawler::run');
     $crawlerCommand->setDescription("Crawls a site");
     $crawlerCommand->addArgument('initialUrl', InputArgument::REQUIRED, 'The initialUrl to be crawled');
     $crawlerCommand->addOption('jobs', 'j', InputOption::VALUE_OPTIONAL, "How many requests to make at once to a domain", 4);
+    
+    $crawlerCommand->addOption('statusOutput', null, InputOption::VALUE_OPTIONAL, "Where to send status output. Allowed values null, stdout, stderr, file", 'stdout');
+    $crawlerCommand->addOption('errorOutput', null, InputOption::VALUE_OPTIONAL, "Where to send error output. Allowed values null, stdout, stderr, file", 'file');
+    $crawlerCommand->addOption('crawlOutput', null, InputOption::VALUE_OPTIONAL, "Where to send error output. Allowed values null, stdout, stderr, file", 'file');
+    $crawlerCommand->addOption('migrationOutput', null, InputOption::VALUE_OPTIONAL, "Where to send migration output. Allowed values null, stdout, stderr, file", 'file');
+
+    
+//    $statusOutputFilename
+//    $errorOutputFilename
+//    $crawlOutputFilename
+//    $migrationOutputFilename
+    
+    
+    
     // $crawlerCommand->addOption('debug', 'd', InputOption::VALUE_OPTIONAL, "Whether to debug an exception", false);
     $application->add($crawlerCommand);
 
@@ -40,11 +55,11 @@ function createApplication()
     $migrateCheckCommand->addArgument('oldDomainName', InputArgument::REQUIRED, 'The old domain name to be crawled');
     $migrateCheckCommand->addArgument('newDomainName', InputArgument::REQUIRED, 'The new domain name to be crawled');
     $migrateCheckCommand->addOption('jobs', 'j', InputOption::VALUE_OPTIONAL, "How many requests to make at once to a domain", 4);
+    $migrateCheckCommand->addOption('statusOutput', null, InputOption::VALUE_OPTIONAL, "Where to send status output. Allowed values null, stdout, stderr, file", 'stdout');
     $application->add($migrateCheckCommand);
 
     return $application;
 }
-
 
 function startsWith($haystack, $needle)
 {
@@ -62,33 +77,6 @@ function endsWith($haystack, $needle)
     return (substr($haystack, -$length) === $needle);
 }
 
-function createFileErrorWriter($errorFilename = null) {
-
-    if ($errorFilename === null) {
-        $errorFilename = "error.txt";
-    }
-
-    return new SiteTool\ErrorWriter\FileErrorWriter($errorFilename);
-}
-
-function createFileResultWriter($resultFilename = null)
-{
-    if ($resultFilename === null) {
-        $resultFilename = "output.txt";
-    }
-
-    return new SiteTool\ResultWriter\FileResultWriter($resultFilename);
-}
-
-function createFileMigrationResultWriter($resultFilename = null)
-{
-    if ($resultFilename === null) {
-        $resultFilename = 'migration_result.txt';
-    }
-
-    return new SiteTool\MigrationResultWriter\FileMigrationResultWriter($resultFilename);
-}
-
 function createStandardResultReader($resultFilename = null)
 {
     if ($resultFilename === null) {
@@ -99,18 +87,90 @@ function createStandardResultReader($resultFilename = null)
 }
 
 
+function createFileWriter($filename)
+{
+    static $fileWritersByPath = [];
+    
+    if (array_key_exists($filename, $fileWritersByPath) === true) {
+        return $this->fileWritersByPath[$filename];
+    }
+    $fileWriter = new \SiteTool\Writer\FileWriter($filename);
+    $fileWritersByPath[$filename] = $fileWriter;
+    
+    return $fileWriter;
+}
+
+
+function createWriter($outputType, $filename)
+{
+    switch ($outputType) {
+        case 'null':
+            return new \SiteTool\Writer\NullWriter();
+        case 'stdout':
+            return new SiteTool\Writer\StdoutWriter();
+        case 'stderr':
+            return new \SiteTool\Writer\StderrWriter();
+        case 'file':
+            return createFileWriter($filename);
+    }
+
+    throw new \Exception("Unknown writer type [$outputType]. Known values are: null, stdout, stderr, file.");
+}
+
+function createStatusWriter($statusOutput, $statusOutputFilename = null)
+{
+    $writer = createWriter($statusOutput, $statusOutputFilename);
+    
+    return new \SiteTool\Writer\StatusWriter($writer);
+}
+
+function createErrorWriter($errorOutput, $errorOutputFilename = null)
+{
+
+    if ($errorOutputFilename === null) {
+        $errorOutputFilename = "error.txt";
+    }
+    
+    $writer = createWriter($errorOutput, $errorOutputFilename);
+    
+    return new \SiteTool\Writer\ErrorWriter($writer);
+}
+
+function createCrawlResultWriter($crawlOutput, $crawlOutputFilename = null)
+{
+    if ($crawlOutputFilename === null) {
+        $crawlOutputFilename = "crawl_result.txt";
+    }
+    
+    $writer = createWriter($crawlOutput, $crawlOutputFilename);
+
+    return new \SiteTool\Writer\CrawlResultWriter($writer);
+}
+
+function createMigrationResultWriter($migrationOutput, $migrationOutputFilename = null)
+{
+    if ($migrationOutputFilename === null) {
+        $migrationOutputFilename = 'migration_result.txt';
+    }
+    $writer = createWriter($migrationOutput, $migrationOutputFilename);
+
+    return new \SiteTool\Writer\MigrationResultWriter($writer);
+}
+
+
 function createCrawlerConfig($initialUrl)
 {
     $urlParts = parse_url($initialUrl);
     if (array_key_exists('host', $urlParts) === false) {
         echo "Could not determine domain name from " . $initialUrl . "\n";
+        echo "Please include the schema like http://example.com";
         exit(-1);
     }
 
     $domainName = $urlParts['host'];
     $initialPath = '/';
 
-    if (array_key_exists('host', $urlParts) === true) {
+    if (array_key_exists('path', $urlParts) === true) {
         $initialPath = $urlParts['path'];
     }
 

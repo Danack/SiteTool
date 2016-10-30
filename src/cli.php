@@ -31,7 +31,6 @@ $tierApp->addExecutable(TIER_ROUTING, 'Tier\Bridge\ConsoleRouter::routeCommand')
 
 try {
     $tierApp->execute();
-    // $injector->execute('Tier\Bridge\ConsoleRouter::routeCommand');
 }
 catch (\Exception $e) {
     echo $e->getMessage() . "\n";

@@ -6,7 +6,7 @@ namespace SiteTool;
 use Auryn\Injector;
 use SiteTool\ResultWriter;
 use SiteTool\ErrorWriter;
-use SiteTool\StatusWriter;
+use SiteTool\Writer\StatusWriter;
 use Zend\EventManager\EventManager;
 
 class Crawler
@@ -21,7 +21,7 @@ class Crawler
             Rules::class,
             SiteChecker::class,
             ResponseParser::class,
-            SkippingStatusWriter::class
+            SkippingLinkWatcher::class
         ];
 
         $pluginInstances = [];
@@ -31,12 +31,10 @@ class Crawler
 
         $firstUrlToCheck = new URLToCheck('http://' . $crawlerConfig->domainName . $crawlerConfig->path, '/');
         $eventManager->trigger(SiteChecker::FOUND_URL_TO_FOLLOW, null, [$firstUrlToCheck]);
-        
-        $fn = function() {
-            echo "Start.";
-        };
 
-        \Amp\run($fn);
+        $statusWriter->write("Start.");
+
+        \Amp\run(function() {});
         $statusWriter->write("fin.");
     }
 }
