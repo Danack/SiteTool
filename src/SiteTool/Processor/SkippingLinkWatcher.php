@@ -1,8 +1,10 @@
 <?php
 
 
-namespace SiteTool;
+namespace SiteTool\Processor;
 
+use SiteTool\Rules;
+use SiteTool\SiteChecker;
 use Zend\EventManager\EventManager;
 use Zend\EventManager\Event;
 use SiteTool\Writer\StatusWriter;

@@ -7,11 +7,14 @@ use AurynConfig\InjectionParams;
 $shares = [
     SiteTool\SiteChecker::class,
     SiteTool\Rules::class,
+    
+    SiteTool\Writer\CheckResultWriter::class,
     SiteTool\Writer\CrawlResultWriter::class,
     SiteTool\Writer\ErrorWriter::class,
     SiteTool\Writer\OutputWriter::class,
     SiteTool\Writer\MigrationResultWriter::class,
     SiteTool\Writer\StatusWriter::class,
+    
     SiteTool\CrawlerConfig::class,
     SiteTool\Writer\FileWriter::class,
     SiteTool\Writer\NullWriter::class,
@@ -34,13 +37,14 @@ $aliases = [
 
 // Delegate the creation of types to callables.
 $delegates = [
-    Danack\Console\Application::class => 'createApplication',
+    //Danack\Console\Application::class => 'createApplication',
     
     SiteTool\CrawlerConfig::class => 'createCrawlerConfig',
     SiteTool\ResultReader\StandardResultReader::class => 'createStandardResultReader',
-    
-    SiteTool\Writer\ErrorWriter::class => 'createErrorWriter',
+  
+    SiteTool\Writer\CheckResultWriter::class => 'createCheckResultWriter',
     SiteTool\Writer\CrawlResultWriter::class => 'createCrawlResultWriter',
+    SiteTool\Writer\ErrorWriter::class => 'createErrorWriter',
     SiteTool\Writer\MigrationResultWriter::class => 'createMigrationResultWriter',
     SiteTool\Writer\StatusWriter::class => 'createStatusWriter',
 ];

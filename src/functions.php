@@ -6,7 +6,6 @@ use Danack\Console\Application;
 use Danack\Console\Command\Command;
 use Danack\Console\Input\InputArgument;
 use Danack\Console\Input\InputOption;
-use SiteTool\StatusWriter;
 
 function getRawCharacters($result)
 {
@@ -25,35 +24,43 @@ function createArtaxClient($jobs)
     return $client;
 }
 
-
 function addOutputOptionsToCommand(Command $command)
 {
     $command->addOption('statusOutput', null, InputOption::VALUE_OPTIONAL, "Where to send status output. Allowed values null, stdout, stderr, or a filename", 'stdout');
     $command->addOption('errorOutput', null, InputOption::VALUE_OPTIONAL, "Where to send error output. Allowed values null, stdout, stderr, or a filename", "error.txt");
 }
 
-
 function createApplication()
 {
     $application = new Application("SiteTool", "1.0.0");
 
-    $crawlerCommand = new Command('site:crawl', 'SiteTool\Crawler::run');
+    $crawlerCommand = new Command('site:crawl', 'SiteTool\Command\Crawler::run');
     $crawlerCommand->setDescription("Crawls a site");
     $crawlerCommand->addArgument('initialUrl', InputArgument::REQUIRED, 'The initialUrl to be crawled');
     $crawlerCommand->addOption('jobs', 'j', InputOption::VALUE_OPTIONAL, "How many requests to make at once to a domain", 4);
     $crawlerCommand->addOption('crawlOutput', null, InputOption::VALUE_OPTIONAL, "Where to send error output. Allowed values null, stdout, stderr, or a filename", "crawl_result.txt");
-    
     $crawlerCommand->addOption('migrationOutput', null, InputOption::VALUE_OPTIONAL, "Where to send migration check output. Allowed values null, stdout, stderr, or a filename", 'migration_result.txt');
+    $crawlerCommand->addOption('checkOutput', null, InputOption::VALUE_OPTIONAL, "Where to send check output. Allowed values null, stdout, stderr, or a filename", 'check_result.txt');
     addOutputOptionsToCommand($crawlerCommand);
     $application->add($crawlerCommand);
+    
+    $statusCheckCommand = new Command('site:check', 'SiteTool\Command\Check::run');
+    $statusCheckCommand->setDescription("Check that all the urls from a site are still ok.");
+    $statusCheckCommand->addOption('jobs', 'j', InputOption::VALUE_OPTIONAL, "How many requests to make at once to a domain", 4);
+    $statusCheckCommand->addOption('crawlOutput', null, InputOption::VALUE_OPTIONAL, "Where to send error output. Allowed values null, stdout, stderr, or a filename", "crawl_result.txt");
+    $statusCheckCommand->addOption('migrationOutput', null, InputOption::VALUE_OPTIONAL, "Where to send migration check output. Allowed values null, stdout, stderr, or a filename", 'migration_result.txt');
+    $statusCheckCommand->addOption('checkOutput', null, InputOption::VALUE_OPTIONAL, "Where to send check output. Allowed values null, stdout, stderr, or a filename", 'check_result.txt');
+    addOutputOptionsToCommand($statusCheckCommand);
+    $application->add($statusCheckCommand);
 
-    $migrateCheckCommand = new Command('site:migratecheck', 'SiteTool\MigrateCheck::run');
+    $migrateCheckCommand = new Command('site:migratecheck', 'SiteTool\Command\MigrateCheck::run');
     $migrateCheckCommand->setDescription("Check that all the urls from an old site are migrated to a new domain correctly.");
     $migrateCheckCommand->addArgument('oldDomainName', InputArgument::REQUIRED, 'The old domain name to be crawled');
     $migrateCheckCommand->addArgument('newDomainName', InputArgument::REQUIRED, 'The new domain name to be crawled');
     $migrateCheckCommand->addOption('jobs', 'j', InputOption::VALUE_OPTIONAL, "How many requests to make at once to a domain", 4);
     $migrateCheckCommand->addOption('statusOutput', null, InputOption::VALUE_OPTIONAL, "Where to send status output. Allowed values null, stdout, stderr, file", 'stdout');
     $migrateCheckCommand->addOption('crawlOutput', null, InputOption::VALUE_OPTIONAL, "Where read the crawl result from. Allowed values null, stdout, stderr, file", 'crawl_result.txt');
+    $migrateCheckCommand->addOption('checkOutput', null, InputOption::VALUE_OPTIONAL, "Where to send check output. Allowed values null, stdout, stderr, or a filename", 'check_result.txt');
     $migrateCheckCommand->addOption('migrationOutput', null, InputOption::VALUE_OPTIONAL, "Where to send migration check output. Allowed values null, stdout, stderr, or a filename", 'migration_result.txt');
     
     addOutputOptionsToCommand($migrateCheckCommand, false);
@@ -124,6 +131,13 @@ function createErrorWriter($errorOutput)
     $writer = createWriter($errorOutput);
 
     return new \SiteTool\Writer\ErrorWriter($writer);
+}
+
+function createCheckResultWriter($checkOutput)
+{
+    $writer = createWriter($checkOutput);
+
+    return new \SiteTool\Writer\CheckResultWriter($writer);
 }
 
 function createCrawlResultWriter($crawlOutput)

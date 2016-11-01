@@ -1,19 +1,17 @@
 <?php
 
-namespace SiteTool;
+namespace SiteTool\Command;
 
 use Auryn\Injector;
 use SiteTool\ResultReader;
 use Amp\Artax\Client as ArtaxClient;
 use Amp\Artax\Response;
+use SiteTool\SiteChecker;
 use Zend\EventManager\EventManager;
 use SiteTool\Writer\OutputWriter;
 
-class MigrateCheck
+class Check
 {
-    private $oldDomainName;
-    private $newDomainName;
-    
     /** @var ResultReader  */
     private $resultReader;
 
@@ -29,15 +27,11 @@ class MigrateCheck
     private $eventManager;
     
     public function __construct(
-        $oldDomainName,
-        $newDomainName,
         ResultReader $resultReader,
         ArtaxClient $artaxClient,
         OutputWriter $outputWriter,
         EventManager $eventManager
     ) {
-        $this->oldDomainName = $oldDomainName; 
-        $this->newDomainName = $newDomainName;
         $this->resultReader = $resultReader;
         $this->eventManager = $eventManager;
         $this->outputWriter = $outputWriter;
@@ -49,7 +43,7 @@ class MigrateCheck
      */
     public function run(Injector $injector)
     {
-        $plugins[] = $injector->make(\SiteTool\MigrateCheckOkStatus::class);
+        $plugins[] = $injector->make(\SiteTool\Processor\SiteCheckOkStatus::class);
         \Amp\run([$this, 'check']);
     }
 
@@ -97,20 +91,21 @@ class MigrateCheck
                 continue;
             }
 
-            $newUrl = str_replace($this->oldDomainName, $this->newDomainName, $result->url);
+            $url = $result->url;
+            
             $this->outputWriter->write(
                 OutputWriter::PROGRESS,
-                "Checking $newUrl"
+                "Checking " . $result->url
             );
-            $promise = $this->artaxClient->request($newUrl);
 
             $analyzeResult = function(
                 \Exception $e = null,
                 Response $response = null
-            ) use ($newUrl) {
-                $this->analyzeResult($e, $response, $newUrl);
+            ) use ($url) {
+                $this->analyzeResult($e, $response, $url);
             };
 
+            $promise = $this->artaxClient->request($url);
             $promise->when($analyzeResult);
         }
     }

@@ -1,13 +1,17 @@
 <?php
 
-namespace SiteTool;
-
+namespace SiteTool\Command;
 
 use Auryn\Injector;
-use SiteTool\ResultWriter;
-use SiteTool\ErrorWriter;
+use SiteTool\CrawlerConfig;
+use SiteTool\Processor\LinkFindingParser;
+use SiteTool\Rules;
+use SiteTool\SiteChecker;
+use SiteTool\Processor\SkippingLinkWatcher;
+use SiteTool\URLToCheck;
 use SiteTool\Writer\StatusWriter;
 use Zend\EventManager\EventManager;
+use SiteTool\Processor\ContentTypeEventList;
 
 class Crawler
 {
@@ -20,8 +24,9 @@ class Crawler
         $plugins = [
             Rules::class,
             SiteChecker::class,
-            ResponseParser::class,
-            SkippingLinkWatcher::class
+            LinkFindingParser::class,
+            SkippingLinkWatcher::class,
+            ContentTypeEventList::class,
         ];
 
         $pluginInstances = [];

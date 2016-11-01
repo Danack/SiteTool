@@ -12,6 +12,8 @@ use SiteTool\Writer\OutputWriter;
 class SiteChecker
 {
     const HTTP_RESPONSE     = 'http_response';
+    
+    const RESPONSE_OK       = 'response_ok';
     const HTML_RECEIVED     = 'html_received';
     const RESPONSE_RECEIVED = 'response_received';
     const FOUND_HREF        = 'found_href';
@@ -48,14 +50,14 @@ class SiteChecker
         ArtaxClient $artaxClient,
         OutputWriter $outputWriter,
         EventManager $eventManager,
-        ContentTypeEventList $contentTypeEvent,
+        //ContentTypeEventList $contentTypeEvent,
         $maxCount
     ) {
         $this->artaxClient = $artaxClient;
         $this->outputWriter = $outputWriter;
         $this->eventManager = $eventManager;
         $this->maxCount = $maxCount;
-        $this->contentTypeEvent = $contentTypeEvent;
+        //$this->contentTypeEvent = $contentTypeEvent;
 
         // This is fine.
         libxml_use_internal_errors(true);
@@ -132,7 +134,7 @@ class SiteChecker
             }
         }
 
-        $this->contentTypeEvent->triggerEventForContent($response, $urlToCheck);
+        $this->eventManager->trigger(SiteChecker::RESPONSE_OK, null, [$response, $urlToCheck]);
     }
 
     function getErrorCount()

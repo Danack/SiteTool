@@ -5,11 +5,13 @@ namespace SiteTool\Writer\OutputWriter;
 
 use SiteTool\SiteToolException;
 
+use SiteTool\Writer\CheckResultWriter;
 use SiteTool\Writer\CrawlResultWriter;
 use SiteTool\Writer\ErrorWriter;
 use SiteTool\Writer\MigrationResultWriter;
 use SiteTool\Writer\OutputWriter;
 use SiteTool\Writer\StatusWriter;
+
 
 
 class StandardOutputWriter implements OutputWriter
@@ -21,12 +23,14 @@ class StandardOutputWriter implements OutputWriter
         CrawlResultWriter $crawlResultWriter,
         StatusWriter $statusWriter,
         ErrorWriter $errorWriter,
-        MigrationResultWriter $migrationResultWriter
+        MigrationResultWriter $migrationResultWriter,
+        CheckResultWriter $checkResultWriter
     ) {
         $this->writers[OutputWriter::PROGRESS] = $statusWriter;
         $this->writers[OutputWriter::CRAWL_RESULT] = $crawlResultWriter;
         $this->writers[OutputWriter::ERROR] = $errorWriter;
         $this->writers[OutputWriter::MIGRATION_RESULT] = $migrationResultWriter;
+        $this->writers[OutputWriter::CHECK_RESULT] = $checkResultWriter;
     }
 
     public function write($type, $string, ...$otherStrings)
@@ -37,7 +41,8 @@ class StandardOutputWriter implements OutputWriter
             OutputWriter::PROGRESS,
             OutputWriter::CRAWL_RESULT, 
             OutputWriter::ERROR,
-            OutputWriter::MIGRATION_RESULT
+            OutputWriter::MIGRATION_RESULT,
+            OutputWriter::CHECK_RESULT
         ];
         
         foreach ($knownWriters as $knownWriter) {

@@ -1,33 +1,32 @@
 <?php
 
-namespace SiteTool;
+namespace SiteTool\Processor;
 
+use SiteTool\Rules;
+use SiteTool\SiteChecker;
+use SiteTool\URLToCheck;
 use Zend\EventManager\EventManager;
 use Zend\EventManager\Event;
 use Amp\Artax\SocketException;
 use FluentDOM\Document;
 use FluentDOM\Element;
-//use SiteTool\ErrorWriter;
-use SiteTool\Writer\CrawlResultWriter;
 
-class ResponseParser
+class LinkFindingParser
 {
     private $errors = 0;
 
     /** @var \Zend\EventManager\EventManager */
     private $eventManager;
     
-    /** @var \SiteTool\ResultWriter  */
+    /** @var \SiteTool\Writer\CrawlResultWriter  */
     private $resultWriter;
     
     public function __construct(
         EventManager $eventManager,
-        Rules $rules,
-        CrawlResultWriter $resultWriter
+        Rules $rules
     ) {
         $this->rules = $rules;
         $this->eventManager = $eventManager;
-        $this->resultWriter = $resultWriter;
         $eventManager->attach(SiteChecker::HTML_RECEIVED, [$this, 'parseResponseEvent']);    
     }
 
@@ -51,7 +50,6 @@ class ResponseParser
     {
         $ok = false;
         $path = $urlToCheck->getUrl();
-        // echo "Parsing body for " . $urlToCheck->getUrl() . "\n";
 
         try {
             $document = new Document();

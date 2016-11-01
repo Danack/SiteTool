@@ -1,17 +1,15 @@
 <?php
 
-
-namespace SiteTool;
+namespace SiteTool\Processor;
 
 use Amp\Artax\Response;
+use SiteTool\SiteChecker;
 use Zend\EventManager\EventManager;
 use Zend\EventManager\Event;
 use SiteTool\Writer\OutputWriter;
 
-class MigrateCheckOkStatus
+class SiteCheckOkStatus
 {
-    //private $migrationResultWriter;
-    
     /** @var OutputWriter  */
     private $outputWriter;
     
@@ -41,7 +39,7 @@ class MigrateCheckOkStatus
         }
 
         $this->outputWriter->write(
-            OutputWriter::PROGRESS | OutputWriter::MIGRATION_RESULT,
+            OutputWriter::PROGRESS | OutputWriter::CHECK_RESULT,
             $status, $fullURL
         );
     }
