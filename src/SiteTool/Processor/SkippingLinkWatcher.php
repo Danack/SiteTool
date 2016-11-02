@@ -7,7 +7,8 @@ use SiteTool\Rules;
 use SiteTool\SiteChecker;
 use Zend\EventManager\EventManager;
 use Zend\EventManager\Event;
-use SiteTool\Writer\StatusWriter;
+//use SiteTool\Writer\StatusWriter;
+use SiteTool\Writer\OutputWriter;
 
 class SkippingLinkWatcher
 {
@@ -16,13 +17,15 @@ class SkippingLinkWatcher
     public function __construct(
         EventManager $eventManager,
         Rules $rules,
-        StatusWriter $statusWriter
+        //StatusWriter $statusWriter,
+        OutputWriter $outputWriter,
+        $skippingLinkEvent
     ) {
         $this->rules = $rules;
         $this->eventManager = $eventManager;
-        $this->statusWriter = $statusWriter;
+        $this->outputWriter = $outputWriter;
 
-        $eventManager->attach(SiteChecker::SKIPPING_LINK_DUE_TO_DOMAIN, [$this, 'skippingLinkEvent']);    
+        $eventManager->attach($skippingLinkEvent, [$this, 'skippingLinkEvent']);    
     }
 
     public function skippingLinkEvent(Event $e)
@@ -38,6 +41,9 @@ class SkippingLinkWatcher
         }
 
         $this->skippedHrefs[$href] = true;
-        $this->statusWriter->write("Skipping $href as host $host is different.");
+        $this->outputWriter->write(
+            OutputWriter::PROGRESS,
+            "Skipping $href as host $host is different."
+        );
     }
 }

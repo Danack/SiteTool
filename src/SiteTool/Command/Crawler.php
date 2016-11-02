@@ -12,34 +12,32 @@ use SiteTool\URLToCheck;
 use SiteTool\Writer\StatusWriter;
 use Zend\EventManager\EventManager;
 use SiteTool\Processor\ContentTypeEventList;
+use SiteTool\PluginFactory;
+use SiteTool\Writer\OutputWriter;
 
 class Crawler
 {
     public function run(
-        Injector $injector,
+        
+        PluginFactory $pluginFactory,
         CrawlerConfig $crawlerConfig,
         EventManager $eventManager,
-        StatusWriter $statusWriter
+        OutputWriter $outputWriter
     ) {
         $plugins = [
-            Rules::class,
-            SiteChecker::class,
-            LinkFindingParser::class,
-            SkippingLinkWatcher::class,
-            ContentTypeEventList::class,
+            $pluginFactory->createRules(SiteChecker::FOUND_URL, SiteChecker::SKIPPING_LINK_DUE_TO_DOMAIN, SiteChecker::FOUND_URL_TO_FOLLOW),
+            $pluginFactory->createSiteChecker( SiteChecker::FOUND_URL_TO_FOLLOW, SiteChecker::RESPONSE_OK),
+            $pluginFactory->createLinkFindingParser(SiteChecker::HTML_RECEIVED , SiteChecker::FOUND_URL),
+            $pluginFactory->createSkippingLinkWatcher(SiteChecker::SKIPPING_LINK_DUE_TO_DOMAIN),
+            $pluginFactory->createContentTypeEventList(SiteChecker::RESPONSE_OK, SiteChecker::HTML_RECEIVED), 
         ];
-
-        $pluginInstances = [];
-        foreach ($plugins as $plugin) {
-            $pluginInstances[] = $injector->make($plugin);
-        }
 
         $firstUrlToCheck = new URLToCheck('http://' . $crawlerConfig->domainName . $crawlerConfig->path, '/');
         $eventManager->trigger(SiteChecker::FOUND_URL_TO_FOLLOW, null, [$firstUrlToCheck]);
 
-        $statusWriter->write("Start.");
+        $outputWriter->write(OutputWriter::PROGRESS, "Start.");
 
         \Amp\run(function() {});
-        $statusWriter->write("fin.");
+        $outputWriter->write(OutputWriter::PROGRESS, "fin.");
     }
 }

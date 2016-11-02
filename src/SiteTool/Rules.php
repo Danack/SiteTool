@@ -7,6 +7,7 @@ use SiteTool\Writer\StatusWriter;
 use SiteTool\Writer\ErrorWriter;
 use Zend\EventManager\EventManager;
 use Zend\EventManager\Event;
+use SiteTool\Writer\OutputWriter;
 
 class Rules
 {
@@ -16,17 +17,27 @@ class Rules
     /** @var StatusWriter  */
     private $statusWriter;
 
+    private $skippingLinkEvent;
+    
+    private $foundUrlToFollowEvent;
+    
     public function __construct(
         CrawlerConfig $crawlerConfig,
         EventManager $eventManager,
-        StatusWriter $statusWriter,
-        ErrorWriter $errorWriter
+        OutputWriter $outputWriter,
+//        StatusWriter $statusWriter,
+//        ErrorWriter $errorWriter,
+        $foundUrlEvent, $skippingLinkEvent, $foundUrlToFollowEvent
     ) {
         $this->crawlerConfig = $crawlerConfig;
-        $this->statusWriter = $statusWriter;
-        $this->errorWriter = $errorWriter;
+//        $this->statusWriter = $statusWriter;
+//        $this->errorWriter = $errorWriter;
+        $this->outputWriter = $outputWriter;
         $this->eventManager = $eventManager;
-        $this->eventManager->attach(SiteChecker::FOUND_URL, [$this, 'foundUrlEvent']);
+        $this->eventManager->attach($foundUrlEvent, [$this, 'foundUrlEvent']);
+        
+        $this->skippingLinkEvent = $skippingLinkEvent;
+        $this->foundUrlToFollowEvent = $foundUrlToFollowEvent;
     }
 
     public function foundUrlEvent(Event $event)
@@ -75,13 +86,17 @@ class Rules
             if (endsWith($parsedUrl['host'], $this->crawlerConfig->domainName) === false) {
                 //$this->statusWriter->write("Skipping $href as host " . $parsedUrl['host'] . " is different.");
                 $this->eventManager->trigger(
-                    SiteChecker::SKIPPING_LINK_DUE_TO_DOMAIN,
+                    $this->skippingLinkEvent,
                     null,
                     [$href, $parsedUrl['host']]
                 );
                 if (strpos($parsedUrl['host'], $this->crawlerConfig->domainName) !== false) {
-                    $this->statusWriter->write("*** PROBABLY BORKED " . $parsedUrl['host'] . "");
-                    $this->errorWriter->write(
+                    $this->outputWriter->write(
+                        OutputWriter::ERROR,
+                        "*** PROBABLY BORKED " . $parsedUrl['host'] . ""
+                    );
+                    $this->outputWriter->write(
+                        OutputWriter::ERROR,
                         "Host probably borked: " . $parsedUrl['host'],
                         "href $href",
                         "Referrer $referrer"
@@ -94,7 +109,7 @@ class Rules
             // $this->statusWriter->write("Following absolute URL $href");
             // If it points to same domain, follow.
             $urlToCheck = new UrlToCheck($href, $referrer);
-            $this->eventManager->trigger(SiteChecker::FOUND_URL_TO_FOLLOW, null, [$urlToCheck]);
+            $this->eventManager->trigger($this->foundUrlToFollowEvent, null, [$urlToCheck]);
         }
 
         //It's relative
@@ -103,7 +118,7 @@ class Rules
             $referrer
         );
         
-        $this->eventManager->trigger(SiteChecker::FOUND_URL_TO_FOLLOW, null, [$urlToCheck]);
+        $this->eventManager->trigger($this->foundUrlToFollowEvent, null, [$urlToCheck]);
     }
 
     public function shouldFollow($fullURL)

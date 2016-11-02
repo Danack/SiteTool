@@ -39,8 +39,6 @@ function createApplication()
     $crawlerCommand->addArgument('initialUrl', InputArgument::REQUIRED, 'The initialUrl to be crawled');
     $crawlerCommand->addOption('jobs', 'j', InputOption::VALUE_OPTIONAL, "How many requests to make at once to a domain", 4);
     $crawlerCommand->addOption('crawlOutput', null, InputOption::VALUE_OPTIONAL, "Where to send error output. Allowed values null, stdout, stderr, or a filename", "crawl_result.txt");
-    $crawlerCommand->addOption('migrationOutput', null, InputOption::VALUE_OPTIONAL, "Where to send migration check output. Allowed values null, stdout, stderr, or a filename", 'migration_result.txt');
-    $crawlerCommand->addOption('checkOutput', null, InputOption::VALUE_OPTIONAL, "Where to send check output. Allowed values null, stdout, stderr, or a filename", 'check_result.txt');
     addOutputOptionsToCommand($crawlerCommand);
     $application->add($crawlerCommand);
     
@@ -48,7 +46,6 @@ function createApplication()
     $statusCheckCommand->setDescription("Check that all the urls from a site are still ok.");
     $statusCheckCommand->addOption('jobs', 'j', InputOption::VALUE_OPTIONAL, "How many requests to make at once to a domain", 4);
     $statusCheckCommand->addOption('crawlOutput', null, InputOption::VALUE_OPTIONAL, "Where to send error output. Allowed values null, stdout, stderr, or a filename", "crawl_result.txt");
-    $statusCheckCommand->addOption('migrationOutput', null, InputOption::VALUE_OPTIONAL, "Where to send migration check output. Allowed values null, stdout, stderr, or a filename", 'migration_result.txt');
     $statusCheckCommand->addOption('checkOutput', null, InputOption::VALUE_OPTIONAL, "Where to send check output. Allowed values null, stdout, stderr, or a filename", 'check_result.txt');
     addOutputOptionsToCommand($statusCheckCommand);
     $application->add($statusCheckCommand);
@@ -58,9 +55,7 @@ function createApplication()
     $migrateCheckCommand->addArgument('oldDomainName', InputArgument::REQUIRED, 'The old domain name to be crawled');
     $migrateCheckCommand->addArgument('newDomainName', InputArgument::REQUIRED, 'The new domain name to be crawled');
     $migrateCheckCommand->addOption('jobs', 'j', InputOption::VALUE_OPTIONAL, "How many requests to make at once to a domain", 4);
-    $migrateCheckCommand->addOption('statusOutput', null, InputOption::VALUE_OPTIONAL, "Where to send status output. Allowed values null, stdout, stderr, file", 'stdout');
     $migrateCheckCommand->addOption('crawlOutput', null, InputOption::VALUE_OPTIONAL, "Where read the crawl result from. Allowed values null, stdout, stderr, file", 'crawl_result.txt');
-    $migrateCheckCommand->addOption('checkOutput', null, InputOption::VALUE_OPTIONAL, "Where to send check output. Allowed values null, stdout, stderr, or a filename", 'check_result.txt');
     $migrateCheckCommand->addOption('migrationOutput', null, InputOption::VALUE_OPTIONAL, "Where to send migration check output. Allowed values null, stdout, stderr, or a filename", 'migration_result.txt');
     
     addOutputOptionsToCommand($migrateCheckCommand, false);
@@ -85,75 +80,14 @@ function endsWith($haystack, $needle)
     return (substr($haystack, -$length) === $needle);
 }
 
-function createStandardResultReader($crawlOutput)
+function createStandardResultReader(\SiteTool\AppConfig $appConfig)
 {
-    return new \SiteTool\ResultReader\StandardResultReader($crawlOutput);
-}
-
-
-function createFileWriter($filename)
-{
-    static $fileWritersByPath = [];
-    
-    if (array_key_exists($filename, $fileWritersByPath) === true) {
-        return $this->fileWritersByPath[$filename];
-    }
-    $fileWriter = new \SiteTool\Writer\FileWriter($filename);
-    $fileWritersByPath[$filename] = $fileWriter;
-    
-    return $fileWriter;
-}
-
-
-function createWriter($outputTypeOrFilename)
-{
-    switch ($outputTypeOrFilename) {
-        case 'null':
-            return new \SiteTool\Writer\NullWriter();
-        case 'stdout':
-            return new SiteTool\Writer\StdoutWriter();
-        case 'stderr':
-            return new \SiteTool\Writer\StderrWriter();
+    if ($appConfig->crawlOutput === null) {
+        throw new \Exception("CrawlOutput is not configured - can't know how to read crawl results");
     }
 
-    return createFileWriter($outputTypeOrFilename);
+    return new \SiteTool\ResultReader\StandardResultReader($appConfig->crawlOutput);
 }
-
-function createStatusWriter($statusOutput)
-{
-    $writer = createWriter($statusOutput);
-    
-    return new \SiteTool\Writer\StatusWriter($writer);
-}
-
-function createErrorWriter($errorOutput)
-{
-    $writer = createWriter($errorOutput);
-
-    return new \SiteTool\Writer\ErrorWriter($writer);
-}
-
-function createCheckResultWriter($checkOutput)
-{
-    $writer = createWriter($checkOutput);
-
-    return new \SiteTool\Writer\CheckResultWriter($writer);
-}
-
-function createCrawlResultWriter($crawlOutput)
-{
-    $writer = createWriter($crawlOutput);
-
-    return new \SiteTool\Writer\CrawlResultWriter($writer);
-}
-
-function createMigrationResultWriter($migrationOutput)
-{
-    $writer = createWriter($migrationOutput);
-
-    return new \SiteTool\Writer\MigrationResultWriter($writer);
-}
-
 
 function createCrawlerConfig($initialUrl)
 {

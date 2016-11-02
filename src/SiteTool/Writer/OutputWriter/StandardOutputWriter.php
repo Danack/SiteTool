@@ -1,18 +1,10 @@
 <?php
 
-
 namespace SiteTool\Writer\OutputWriter;
 
-use SiteTool\SiteToolException;
-
-use SiteTool\Writer\CheckResultWriter;
-use SiteTool\Writer\CrawlResultWriter;
-use SiteTool\Writer\ErrorWriter;
-use SiteTool\Writer\MigrationResultWriter;
 use SiteTool\Writer\OutputWriter;
-use SiteTool\Writer\StatusWriter;
-
-
+use SiteTool\AppConfig;
+use SiteTool\Writer\WriterFactory;
 
 class StandardOutputWriter implements OutputWriter
 {
@@ -20,17 +12,14 @@ class StandardOutputWriter implements OutputWriter
     private $writers = [];
 
     public function __construct(
-        CrawlResultWriter $crawlResultWriter,
-        StatusWriter $statusWriter,
-        ErrorWriter $errorWriter,
-        MigrationResultWriter $migrationResultWriter,
-        CheckResultWriter $checkResultWriter
+        AppConfig $appConfig,
+        WriterFactory $writerFactory
     ) {
-        $this->writers[OutputWriter::PROGRESS] = $statusWriter;
-        $this->writers[OutputWriter::CRAWL_RESULT] = $crawlResultWriter;
-        $this->writers[OutputWriter::ERROR] = $errorWriter;
-        $this->writers[OutputWriter::MIGRATION_RESULT] = $migrationResultWriter;
-        $this->writers[OutputWriter::CHECK_RESULT] = $checkResultWriter;
+        $this->writers[OutputWriter::PROGRESS] = $writerFactory->create($appConfig->statusOutput);
+        $this->writers[OutputWriter::CRAWL_RESULT] = $writerFactory->create($appConfig->crawlOutput);
+        $this->writers[OutputWriter::ERROR] = $writerFactory->create($appConfig->errorOutput);
+        $this->writers[OutputWriter::MIGRATION_RESULT] = $writerFactory->create($appConfig->migrationOutput);
+        $this->writers[OutputWriter::CHECK_RESULT] = $writerFactory->create($appConfig->checkOutput);
     }
 
     public function write($type, $string, ...$otherStrings)
@@ -47,7 +36,11 @@ class StandardOutputWriter implements OutputWriter
         
         foreach ($knownWriters as $knownWriter) {
             if (($type & $knownWriter) !== 0) {
-                $this->writers[$knownWriter]->write($string, ...$otherStrings);
+                $writer = $this->writers[$knownWriter];
+                if ($writer === null) {
+                    throw new \Exception("Writer type [$type] is not configured for this tool.");
+                }
+                $writer->write($string, ...$otherStrings);
             }
 
             $type = ($type & (~$knownWriter));

@@ -8,7 +8,6 @@ use Zend\EventManager\EventManager;
 use Zend\EventManager\Event;
 use SiteTool\Writer\OutputWriter;
 
-
 class SiteChecker
 {
     const HTTP_RESPONSE     = 'http_response';
@@ -46,23 +45,26 @@ class SiteChecker
     
     private $maxCount;
     
+    private $responseOkEvent;
+    
     function __construct(
         ArtaxClient $artaxClient,
         OutputWriter $outputWriter,
         EventManager $eventManager,
-        //ContentTypeEventList $contentTypeEvent,
-        $maxCount
+        $maxCount,
+        $foundUrlToFollowEvent,
+        $responseOkEvent
     ) {
         $this->artaxClient = $artaxClient;
         $this->outputWriter = $outputWriter;
         $this->eventManager = $eventManager;
         $this->maxCount = $maxCount;
-        //$this->contentTypeEvent = $contentTypeEvent;
 
         // This is fine.
         libxml_use_internal_errors(true);
 
-        $eventManager->attach(SiteChecker::FOUND_URL_TO_FOLLOW, [$this, 'followURLEvent']);
+        $eventManager->attach($foundUrlToFollowEvent, [$this, 'followURLEvent']);
+        $this->responseOkEvent = $responseOkEvent;
     }
 
 
@@ -134,7 +136,7 @@ class SiteChecker
             }
         }
 
-        $this->eventManager->trigger(SiteChecker::RESPONSE_OK, null, [$response, $urlToCheck]);
+        $this->eventManager->trigger($this->responseOkEvent, null, [$response, $urlToCheck]);
     }
 
     function getErrorCount()

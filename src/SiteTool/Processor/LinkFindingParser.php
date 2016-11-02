@@ -23,11 +23,14 @@ class LinkFindingParser
     
     public function __construct(
         EventManager $eventManager,
-        Rules $rules
+        Rules $rules,
+        $htmlReceivedEvent,
+        $foundUrlEvent
     ) {
         $this->rules = $rules;
         $this->eventManager = $eventManager;
-        $eventManager->attach(SiteChecker::HTML_RECEIVED, [$this, 'parseResponseEvent']);    
+        $eventManager->attach($htmlReceivedEvent, [$this, 'parseResponseEvent']);
+        $this->foundUrlEvent = $foundUrlEvent;
     }
 
     /**
@@ -57,7 +60,7 @@ class LinkFindingParser
             $document->loadHTML($body);
             $linkClosure = function (Element $element) use ($urlToCheck) {
                 $href = $element->getAttribute('href');
-                $this->eventManager->trigger(SiteChecker::FOUND_URL, null, [$href, $urlToCheck->getUrl()]);
+                $this->eventManager->trigger($this->foundUrlEvent, null, [$href, $urlToCheck->getUrl()]);
             };
 
             $document->find('//a')->each($linkClosure);
