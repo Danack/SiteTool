@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "4ea7f403b29a195a794dd11f5fdd340e",
+    "hash": "5aa85865677d5a11f89ad16a76a9074b",
     "packages": [
         {
             "name": "amphp/amp",
@@ -171,16 +171,16 @@
         },
         {
             "name": "amphp/dns",
-            "version": "v0.8.11",
+            "version": "dev-fix/udp-recvfrom",
             "source": {
                 "type": "git",
                 "url": "https://github.com/amphp/dns.git",
-                "reference": "ba6016dd0a2a79e2eed8b2392ae3002d49120aaa"
+                "reference": "d636e75a9d8be31353321abf94d56b1f546d7aa2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/amphp/dns/zipball/ba6016dd0a2a79e2eed8b2392ae3002d49120aaa",
-                "reference": "ba6016dd0a2a79e2eed8b2392ae3002d49120aaa",
+                "url": "https://api.github.com/repos/amphp/dns/zipball/d636e75a9d8be31353321abf94d56b1f546d7aa2",
+                "reference": "d636e75a9d8be31353321abf94d56b1f546d7aa2",
                 "shasum": ""
             },
             "require": {
@@ -191,7 +191,7 @@
                 "php": ">=5.5"
             },
             "require-dev": {
-                "fabpot/php-cs-fixer": "^1.9",
+                "friendsofphp/php-cs-fixer": "^1.9",
                 "phpunit/phpunit": "^4.8"
             },
             "type": "library",
@@ -204,11 +204,18 @@
                     "lib/functions.php"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
             "authors": [
+                {
+                    "name": "Chris Wright",
+                    "email": "addr@daverandom.com"
+                },
+                {
+                    "name": "Daniel Lowrey",
+                    "email": "rdlowrey@php.net"
+                },
                 {
                     "name": "Bob Weinand",
                     "email": "bobwei9@hotmail.com"
@@ -216,14 +223,6 @@
                 {
                     "name": "Niklas Keller",
                     "email": "me@kelunik.com"
-                },
-                {
-                    "name": "Daniel Lowrey",
-                    "email": "rdlowrey@php.net"
-                },
-                {
-                    "name": "Chris Wright",
-                    "email": "addr@daverandom.com"
                 }
             ],
             "description": "Async DNS resolution built on the amp concurrency framework",
@@ -235,7 +234,11 @@
                 "dns",
                 "resolve"
             ],
-            "time": "2016-05-26 19:49:36"
+            "support": {
+                "source": "https://github.com/amphp/dns/tree/fix/udp-recvfrom",
+                "issues": "https://github.com/amphp/dns/issues"
+            },
+            "time": "2016-11-04 11:46:40"
         },
         {
             "name": "amphp/file",
@@ -1505,9 +1508,18 @@
             "time": "2016-10-21 20:59:10"
         }
     ],
-    "aliases": [],
+    "aliases": [
+        {
+            "alias": "v0.8.11",
+            "alias_normalized": "0.8.11.0",
+            "version": "dev-fix/udp-recvfrom",
+            "package": "amphp/dns"
+        }
+    ],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "amphp/dns": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
