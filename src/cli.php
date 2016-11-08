@@ -28,6 +28,10 @@ $injector->share($app);
 
 define('TIER_ROUTING', 10);
 
+$resolver = new \SiteTool\BlockingResolver();
+
+\Amp\Dns\resolver($resolver);
+
 $tierApp->addExecutable(TIER_ROUTING, 'Tier\Bridge\ConsoleRouter::routeCommand');
 
 try {

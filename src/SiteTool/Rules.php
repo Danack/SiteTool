@@ -67,7 +67,10 @@ class Rules
         
         foreach ($knownNonLinks as $knownNonLink) {
             if (stripos($href, $knownNonLink) === 0) {
-                $this->statusWriter->write("skipping known non-link $knownNonLink");
+                $this->outputWriter->write(
+                    OutputWriter::PROGRESS,
+                    "skipping known non-link $knownNonLink"
+                );
                 return null;
             }
         }

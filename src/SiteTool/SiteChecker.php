@@ -74,14 +74,14 @@ class SiteChecker
      * @param $fullURL
      * @return null
      */
-    function handleException(\Exception $e, Response $response = null, $fullURL)
+    function handleException(\Exception $e, Response $response = null, $fullURL, $referrer)
     {
-        $message = "Something went wrong for $fullURL : " . $e->getMessage();
+        $message = "RequestException for $fullURL : " . $e->getMessage() . " from referrer " . $referrer;
         if ($response) {
             $message .= "Headers " . var_export($response->getAllHeaders(), true);
         }
         $this->outputWriter->write(
-            OutputWriter::PROGRESS,
+            OutputWriter::PROGRESS | OutputWriter::ERROR,
             $message
         );
         $this->errors++;
@@ -102,7 +102,7 @@ class SiteChecker
         static $first = true;
         
         if ($e) {
-            $this->handleException($e, $response, $fullURL);
+            $this->handleException($e, $response, $fullURL, $urlToCheck->getReferrer());
             return;
         }
 
@@ -171,7 +171,7 @@ class SiteChecker
         ) use ($urlToCheck, $fullURL) {
             $this->outputWriter->write(
                 OutputWriter::PROGRESS,
-                "Got $fullURL"
+                "Processing $fullURL"
             );
             $this->analyzeResult($e, $response, $urlToCheck, $fullURL);
         };
@@ -186,7 +186,6 @@ class SiteChecker
     {
         $url = $urlToCheck->getUrl();
         if (array_key_exists($url, $this->urlsToCheck) === true) {
-
             return null;
         }
 
