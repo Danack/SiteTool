@@ -21,12 +21,6 @@ class MigrateCheckOkStatus
         $this->outputWriter = $outputWriter;
     }
 
-    public function checkStatusEvent(Event $event)
-    {
-        list($response, $fullURL) = $event->getParams();
-        $this->checkStatus($response, $fullURL);
-    }
-
     public function checkStatus(Response $response, $fullURL)
     {
         $status = $response->getStatus();

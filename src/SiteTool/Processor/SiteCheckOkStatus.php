@@ -14,17 +14,9 @@ class SiteCheckOkStatus
     private $outputWriter;
     
     public function __construct(
-        EventManager $eventManager,
         OutputWriter $outputWriter
     ) {
-        $eventManager->attach(SiteChecker::RESPONSE_RECEIVED, [$this, 'checkStatusEvent']);
         $this->outputWriter = $outputWriter;
-    }
-
-    public function checkStatusEvent(Event $event)
-    {
-        list($response, $fullURL) = $event->getParams();
-        $this->checkStatus($response, $fullURL);
     }
 
     public function checkStatus(Response $response, $fullURL)

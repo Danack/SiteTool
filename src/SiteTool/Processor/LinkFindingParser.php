@@ -2,7 +2,7 @@
 
 namespace SiteTool\Processor;
 
-use SiteTool\Rules;
+use SiteTool\Processor\Rules;
 use SiteTool\SiteChecker;
 use SiteTool\URLToCheck;
 use Zend\EventManager\EventManager;
@@ -10,6 +10,8 @@ use Zend\EventManager\Event;
 use Amp\Artax\SocketException;
 use FluentDOM\Document;
 use FluentDOM\Element;
+use SiteTool\Event\ParseEvent;
+use SiteTool\Writer\OutputWriter;
 
 class LinkFindingParser
 {
@@ -18,38 +20,31 @@ class LinkFindingParser
     /** @var \Zend\EventManager\EventManager */
     private $eventManager;
     
-    /** @var \SiteTool\Writer\CrawlResultWriter  */
-    private $resultWriter;
+    /** @var \SiteTool\Writer\OutputWriter  */
+    private $outputWriter;
     
     public function __construct(
-        EventManager $eventManager,
-        Rules $rules,
-        $htmlReceivedEvent,
-        $foundUrlEvent
+        OutputWriter $outputWriter//,
+//        EventManager $eventManager,
+//        Rules $rules,
+//        $htmlReceivedEvent,
+//        $foundUrlEvent
     ) {
-        $this->rules = $rules;
-        $this->eventManager = $eventManager;
-        $eventManager->attach($htmlReceivedEvent, [$this, 'parseResponseEvent']);
-        $this->foundUrlEvent = $foundUrlEvent;
+//        $this->eventManager = $eventManager;
+//        $eventManager->attach($htmlReceivedEvent, [$this, 'parseResponseEvent']);
+//        $this->foundUrlEvent = $foundUrlEvent;
+        
+        $this->outputWriter = $outputWriter;
     }
 
-    /**
-     * @param Event $e
-     */
-    public function parseResponseEvent(Event $e)
-    {
-        $params = $e->getParams();
-        $urlToCheck = $params[0];
-        $responseBody = $params[1];
-
-        $this->parseResponse($urlToCheck, $responseBody);
-    }
 
     /**
      * @param URLToCheck $urlToCheck
      * @param $body
      */
-    function parseResponse(URLToCheck $urlToCheck, $body)
+    function parseResponse(
+        URLToCheck $urlToCheck, $body,
+        ParseEvent $parseEvent)
     {
         $ok = false;
         $path = $urlToCheck->getUrl();
@@ -58,9 +53,12 @@ class LinkFindingParser
             $document = new Document();
             $body = mb_convert_encoding($body, 'HTML-ENTITIES', 'UTF-8');
             $document->loadHTML($body);
-            $linkClosure = function (Element $element) use ($urlToCheck) {
+            $linkClosure = function (Element $element) use ($urlToCheck, $parseEvent) {
                 $href = $element->getAttribute('href');
-                $this->eventManager->trigger($this->foundUrlEvent, null, [$href, $urlToCheck->getUrl()]);
+                $href = html_entity_decode($href);
+                
+                //$this->eventManager->trigger($this->foundUrlEvent, null, [$href, $urlToCheck->getUrl()]);
+                $parseEvent->foundUrlEvent($href, $urlToCheck);
             };
 
             $document->find('//a')->each($linkClosure);
@@ -68,7 +66,8 @@ class LinkFindingParser
         }
         catch (SocketException $se) {
             $message = "Artax\\SocketException on $path - ".$se->getMessage(). " Exception type is ".get_class($se);
-            $this->resultWriter->write(
+            $this->outputWriter->write(
+                \SiteTool\Writer\OutputWriter::CRAWL_RESULT,
                 $path,
                 500,
                 $urlToCheck->getReferrer(),
@@ -77,7 +76,8 @@ class LinkFindingParser
         }
         catch(\InvalidArgumentException $iae) {
             $message = "Fluent dom exception on $path - ".$iae->getMessage(). " Exception type is ".get_class($iae);
-            $this->resultWriter->write(
+            $this->outputWriter->write(
+                \SiteTool\Writer\OutputWriter::CRAWL_RESULT,
                 $path,
                 500,
                 $urlToCheck->getReferrer(),

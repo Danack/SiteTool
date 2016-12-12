@@ -6,7 +6,7 @@ use AurynConfig\InjectionParams;
 // These classes will only be created  by the injector once
 $shares = [
     SiteTool\SiteChecker::class,
-    SiteTool\Rules::class,
+    SiteTool\Processor\Rules::class,
 
     SiteTool\CrawlerConfig::class,
     SiteTool\Writer\FileWriter::class,
@@ -31,11 +31,6 @@ $aliases = [
 $delegates = [
     SiteTool\CrawlerConfig::class => 'createCrawlerConfig',
     SiteTool\ResultReader\StandardResultReader::class => 'createStandardResultReader',
-//    SiteTool\Writer\CheckResultWriter::class => 'createCheckResultWriter',
-//    SiteTool\Writer\CrawlResultWriter::class => 'createCrawlResultWriter',
-//    SiteTool\Writer\ErrorWriter::class => 'createErrorWriter',
-//    SiteTool\Writer\MigrationResultWriter::class => 'createMigrationResultWriter',
-//    SiteTool\Writer\StatusWriter::class => 'createStatusWriter',
 ];
 
 // If necessary, define some params per class.

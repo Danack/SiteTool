@@ -30,6 +30,11 @@ define('TIER_ROUTING', 10);
 
 $resolver = new \SiteTool\BlockingResolver();
 
+$em = new \SiteTool\DebuggingEventManager();
+
+$injector->share($em);
+$injector->alias(\Zend\EventManager\EventManager::class, SiteTool\DebuggingEventManager::class);
+
 \Amp\Dns\resolver($resolver);
 
 $tierApp->addExecutable(TIER_ROUTING, 'Tier\Bridge\ConsoleRouter::routeCommand');

@@ -7,7 +7,7 @@ namespace SiteTool;
 use Auryn\Injector;
 use SiteTool\CrawlerConfig;
 use SiteTool\Processor\LinkFindingParser;
-use SiteTool\Rules;
+use SiteTool\Processor\Rules;
 use SiteTool\SiteChecker;
 use SiteTool\Processor\SkippingLinkWatcher;
 use SiteTool\URLToCheck;
@@ -67,6 +67,18 @@ class PluginFactory
             ]
         );
     }
+    
+    public function createContentTypeEventList($responseOkEvent, $htmlReceivedEvent)
+    {
+        return $this->injector->make(
+            ContentTypeEventList::class,
+            [
+                ':responseOkEvent' => $responseOkEvent, 
+                ':htmlReceivedEvent' => $htmlReceivedEvent
+            ]
+        );
+    }
+    
     
     public function createContentTypeEventList($responseOkEvent, $htmlReceivedEvent)
     {

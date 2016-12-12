@@ -8,34 +8,20 @@ use SiteTool\SiteChecker;
 use SiteTool\UrlToCheck;
 use Zend\EventManager\Event;
 use Zend\EventManager\EventManager;
+use SiteTool\Event\ContentTypeEvent;
 
 class ContentTypeEventList
 {
-    /** @var EventManager */
-    private $eventManager;
-    
-    public function __construct(EventManager $eventManager)
-    {
-        $this->eventManager = $eventManager;
-        $eventManager->attach(SiteChecker::RESPONSE_OK, [$this, 'responseOkEvent']);
-    }
-
-    function responseOkEvent(Event $event)
-    {
-        $params = $event->getParams();
-        $response = $params[0];
-        $urlToCheck = $params[1];
-
-        $this->triggerEventForContent($response, $urlToCheck);
-    }
-    
     /**
      * @param Response $response
      * @param UrlToCheck $urlToCheck
      * @return null
      * @throws \Exception
      */
-    public function triggerEventForContent(Response $response, UrlToCheck $urlToCheck)
+    public function triggerEventForContent(
+        Response $response,
+        UrlToCheck $urlToCheck,
+        ContentTypeEvent $contentTypeEvent)
     {
         $contentTypeHeaders = $response->getHeader('Content-Type');
 
@@ -49,10 +35,6 @@ class ContentTypeEventList
         if ($colonPosition !== false) {
             $contentType = substr($contentType, 0, $colonPosition);
         }
-        
-        $contentTypeEvents = [
-            'text/html' => SiteChecker::HTML_RECEIVED,
-        ];
 
 //        $ignoredContentTypes = [
 //            'text/plain',
@@ -64,13 +46,10 @@ class ContentTypeEventList
 //            'image/png',
 //            'application/atom+xml',
 //        ];
-        
-        if (array_key_exists($contentType, $contentTypeEvents) === true) {
-            $event = $contentTypeEvents[$contentType];
-            $this->eventManager->trigger($event, null, [$urlToCheck, $response->getBody()]);
+
+        if ($contentType === 'text/html') {
+            $contentTypeEvent->htmlReceived($response, $urlToCheck);
             return;
         }
-
-        // throw new \Exception("Unrecognised content-type $contentType");
     }
 }
