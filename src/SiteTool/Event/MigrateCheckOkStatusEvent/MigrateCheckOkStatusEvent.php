@@ -2,11 +2,13 @@
 
 namespace SiteTool\Event\MigrateCheckOkStatusEvent;
 
-use Zend\EventManager\EventManager;
+//use Zend\EventManager\EventManager;
 use Zend\EventManager\Event;
 use SiteTool\SiteChecker;
 use SiteTool\Event\MigrateCheckOkStatusEvent;
 use SiteTool\Processor\MigrateCheckOkStatus;
+
+use SiteTool\EventManager;
 
 
 class MigrateCheckOkStatusZendEvent implements MigrateCheckOkStatusEvent

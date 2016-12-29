@@ -16,8 +16,10 @@ $shares = [
 
     SiteTool\CrawlerConfig::class,
     SiteTool\ResultReader\StandardResultReader::class,
+    SiteTool\GraphVizTest::class,
 
     Zend\EventManager\EventManager::class,
+    
 ];
 
 // Alias interfaces (or classes) to the actual types that should be used 
@@ -25,6 +27,7 @@ $shares = [
 $aliases = [
     SiteTool\ResultReader::class => SiteTool\ResultReader\StandardResultReader::class,
     SiteTool\Writer\OutputWriter::class => SiteTool\Writer\OutputWriter\StandardOutputWriter::class,
+    SiteTool\EventManager::class => SiteTool\EventManager\BlahEventManager::class
 ];
 
 // Delegate the creation of types to callables.
@@ -41,6 +44,9 @@ $classParams = [
 // If necessary, define some params that can be injected purely by name.
 $defines = [
     'maxCount' => 50000,
+    'jobs' => 4,
+    'initialUrl' => 'http://phpimagick.com',
+    
 ];
 
 $prepares = [

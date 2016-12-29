@@ -5,34 +5,35 @@ namespace SiteTool\Event\LinkFetcherEvent;
 
 use SiteTool\Event\LinkFetcherEvent;
 use SiteTool\Event\RulesEvent;
-use SiteTool\Processor\Rules;
 use SiteTool\UrlToCheck;
 use Zend\EventManager\Event;
-use Zend\EventManager\EventManager;
 use SiteTool\Event\ResponseOkEvent;
-use SiteTool\Processor\ResponseValid;
 use Amp\Artax\Response;
 use SiteTool\Processor\LinkFetcher;
 use SiteTool\SiteChecker;
+use SiteTool\EventManager;
 
 
 class LinkFetcherZendEvent implements LinkFetcherEvent
 {
-    /** @var EventManager  */
-    private $eventManager;
-    
     /** @var LinkFetcher */
     private $linkFetcher;
     
+    /** @var  callable */
+    private $responseReceivedTrigger;
+    
+    private $switchName = "Fetch the URL";
+    
     public function __construct(
         EventManager $eventManager,
-        LinkFetcher $linkFetcher
+        LinkFetcher $linkFetcher,
+        $foundUrlToFollowEvent
     ) {
-        $this->eventManager = $eventManager;
         $this->linkFetcher = $linkFetcher;
-        $eventManager->attach(SiteChecker::FOUND_URL_TO_FOLLOW, [$this, 'followURLEvent']);
+        $this->responseReceivedTrigger = $eventManager->createTrigger(SiteChecker::RESPONSE_RECEIVED, $this->switchName);
+        $eventManager->attach(SiteChecker::FOUND_URL_TO_FOLLOW, [$this, 'followURLEvent'], $this->switchName);
     }
-    
+
     /**
      * @param Event $e
      */
@@ -54,7 +55,8 @@ class LinkFetcherZendEvent implements LinkFetcherEvent
             $urlToCheck,
             $fullURL
         ];
-        
-        $this->eventManager->trigger(SiteChecker::RESPONSE_RECEIVED, null, $params);
+
+        $fn = $this->responseReceivedTrigger;
+        $fn($params);
     }
 }

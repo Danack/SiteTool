@@ -7,18 +7,20 @@ use SiteTool\Event\RulesEvent;
 use SiteTool\Processor\Rules;
 use SiteTool\UrlToCheck;
 use Zend\EventManager\Event;
-use Zend\EventManager\EventManager;
+//use Zend\EventManager\EventManager;
+use SiteTool\EventManager;
 
 class RulesZendEvent implements RulesEvent
 {
     private $rules;
+
+    /** @var  callable */
+    private $skippingLinkTrigger;
     
-    /** @var \Zend\EventManager\EventManager */
-    private $eventManager;
-    
-    private $skippingLinkEvent;
-    
-    private $foundUrlToFollowEvent;
+    /** @var  callable */
+    private $foundUrlToFollowTrigger;
+
+    private $switchName = "Should we follow this URL?";
     
     public function __construct(
         EventManager $eventManager,
@@ -26,11 +28,10 @@ class RulesZendEvent implements RulesEvent
         $foundUrlEvent, $skippingLinkEvent, $foundUrlToFollowEvent
     ) {
         $this->rules = $rules;
-        $this->eventManager = $eventManager;
-        $this->eventManager->attach($foundUrlEvent, [$this, 'foundUrlEvent']);
 
-        $this->skippingLinkEvent = $skippingLinkEvent;
-        $this->foundUrlToFollowEvent = $foundUrlToFollowEvent;
+        $eventManager->attach($foundUrlEvent, [$this, 'foundUrlEvent'], $this->switchName);
+        $this->skippingLinkTrigger =  $eventManager->createTrigger($skippingLinkEvent, $this->switchName);
+        $this->foundUrlToFollowTrigger =  $eventManager->createTrigger($foundUrlToFollowEvent, $this->switchName);
     }
 
     public function foundUrlEvent(Event $event)
@@ -42,15 +43,13 @@ class RulesZendEvent implements RulesEvent
 
     public function skippingLink($href, $host)
     {
-        $this->eventManager->trigger(
-            $this->skippingLinkEvent,
-            null,
-            [$href, $host]
-        );
+        $fn = $this->skippingLinkTrigger;
+        $fn([$href, $host]);
     }
 
     function foundUrlToFollow(UrlToCheck $urlToCheck)
     {
-        $this->eventManager->trigger($this->foundUrlToFollowEvent, null, [$urlToCheck]);
+        $fn = $this->foundUrlToFollowTrigger;
+        $fn([$urlToCheck]);
     }
 }

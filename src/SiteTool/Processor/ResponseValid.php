@@ -21,21 +21,11 @@ class ResponseValid
     
     private $count = 0;
 
-//    /**
-//     * @var ArtaxClient
-//     */
-//    private $artaxClient;
-//    
     /** @var OutputWriter */
     private $outputWriter;
 
-//    /** @var EventManager */
-//    private $eventManager;
-    
     private $maxCount;
-    
-    private $responseOkEvent;
-    
+
     function __construct(
         ArtaxClient $artaxClient,
         OutputWriter $outputWriter,
@@ -44,16 +34,11 @@ class ResponseValid
         $foundUrlToFollowEvent,
         $responseOkEvent
     ) {
-        //$this->artaxClient = $artaxClient;
         $this->outputWriter = $outputWriter;
-        //$this->eventManager = $eventManager;
         $this->maxCount = $maxCount;
 
         // This is fine.
         libxml_use_internal_errors(true);
-
-        //$eventManager->attach($foundUrlToFollowEvent, [$this, 'followURLEvent']);
-        //$this->responseOkEvent = $responseOkEvent;
     }
     
     /**
@@ -104,7 +89,6 @@ class ResponseValid
         }
 
         $responseOkEvent->responseOk($response, $urlToCheck);
-        //$this->eventManager->trigger($this->responseOkEvent, null, [$response, $urlToCheck]);
     }
 
     function getErrorCount()

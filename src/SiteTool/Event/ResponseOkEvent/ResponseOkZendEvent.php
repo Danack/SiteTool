@@ -6,24 +6,27 @@ use SiteTool\Event\RulesEvent;
 use SiteTool\Processor\Rules;
 use SiteTool\UrlToCheck;
 use Zend\EventManager\Event;
-use Zend\EventManager\EventManager;
 use SiteTool\Event\ResponseOkEvent;
 use SiteTool\Processor\ResponseValid;
 use Amp\Artax\Response;
 use SiteTool\SiteChecker;
+use SiteTool\EventManager;
 
 class ResponseOkZendEvent implements ResponseOkEvent
 {
-    /** @var EventManager  */
-    private $eventManager;
+    /** @var  \callable */
+    private $responseOkTrigger;
+
+    
+    private $switchName = "Is the response OK?";
     
     public function __construct(
         EventManager $eventManager,
         ResponseValid $responseValid
     ) {
-        $this->eventManager = $eventManager;
         $this->responseValid = $responseValid;
-        $eventManager->attach(SiteChecker::RESPONSE_RECEIVED, [$this, 'resultFetchedEvent']);
+        $eventManager->attach(SiteChecker::RESPONSE_RECEIVED, [$this, 'resultFetchedEvent'], $this->switchName);
+        $this->responseOkTrigger = $eventManager->createTrigger(SiteChecker::RESPONSE_OK, $this->switchName);
     }
 
     public function resultFetchedEvent(Event $event)
@@ -45,6 +48,7 @@ class ResponseOkZendEvent implements ResponseOkEvent
 
     public function responseOk(Response $response, UrlToCheck $urlToCheck)
     {
-        $this->eventManager->trigger(SiteChecker::RESPONSE_OK, null, [$response, $urlToCheck]);
+        $fn = $this->responseOkTrigger;
+        $fn([$response, $urlToCheck]);
     }
 }

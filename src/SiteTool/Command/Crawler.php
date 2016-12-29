@@ -22,14 +22,14 @@ use SiteTool\Event\ResponseOkEvent\ResponseOkZendEvent;
 use SiteTool\Event\RulesEvent\RulesZendEvent;
 use SiteTool\Event\SiteCheckOkStatusEvent\SiteCheckOkStatusZendEvent;
 use SiteTool\Event\SkippingLinkWatcherEvent\SkippingLinkWatcherZendEvent;
+use SiteTool\GraphVizTest;
+
+
 
 class Crawler
 {
-    public function run(
-        //PluginFactory $pluginFactory,
-        CrawlerConfig $crawlerConfig,
-        EventManager $eventManager,
-        OutputWriter $outputWriter,
+    public function __construct(
+        
         Injector $injector
     ) {
         // This is fine.
@@ -52,7 +52,7 @@ class Crawler
             'foundUrlEvent' => SiteChecker::FOUND_URL,
             'skippingLinkEvent' => SiteChecker::SKIPPING_LINK_DUE_TO_DOMAIN,
         ];
-        
+
         foreach ($eventNames as $paramName => $value) {
             $injector->defineParam($paramName, $value);
         }
@@ -60,22 +60,33 @@ class Crawler
         foreach ($relaysToCreate as $relayToCreate) {
             $relays[] = $injector->make($relayToCreate);
         }
+    }
 
-//        $plugins = [
+    public function debug(GraphVizTest $graphVizTest)
+    {
+        $graphVizTest->finalize();
+    }
+    
+    
+    public function run(
+        EventManager $eventManager,
+        CrawlerConfig $crawlerConfig,
+        OutputWriter $outputWriter
+    ) {
+        $firstUrlToCheck = new URLToCheck('http://' . $crawlerConfig->domainName . $crawlerConfig->path, '/');
+        $eventManager->trigger(SiteChecker::FOUND_URL_TO_FOLLOW, null, [$firstUrlToCheck]);
+        $outputWriter->write(OutputWriter::PROGRESS, "Start.");
+
+        \Amp\run(function() {});
+        $outputWriter->write(OutputWriter::PROGRESS, "fin.");
+    }
+    
+    
+    //        $plugins = [
 //            //$pluginFactory->createRules(SiteChecker::FOUND_URL, SiteChecker::SKIPPING_LINK_DUE_TO_DOMAIN, SiteChecker::FOUND_URL_TO_FOLLOW),
 //            $pluginFactory->createSiteChecker( SiteChecker::FOUND_URL_TO_FOLLOW, SiteChecker::RESPONSE_OK),
 //            $pluginFactory->createLinkFindingParser(SiteChecker::HTML_RECEIVED , SiteChecker::FOUND_URL),
 //            $pluginFactory->createSkippingLinkWatcher(SiteChecker::SKIPPING_LINK_DUE_TO_DOMAIN),
 //            $pluginFactory->createContentTypeEventList(SiteChecker::RESPONSE_OK, SiteChecker::HTML_RECEIVED),
 //        ];
-                        
-
-        $firstUrlToCheck = new URLToCheck('http://' . $crawlerConfig->domainName . $crawlerConfig->path, '/');
-        $eventManager->trigger(SiteChecker::FOUND_URL_TO_FOLLOW, null, [$firstUrlToCheck]);
-
-        $outputWriter->write(OutputWriter::PROGRESS, "Start.");
-
-        \Amp\run(function() {});
-        $outputWriter->write(OutputWriter::PROGRESS, "fin.");
-    }
 }

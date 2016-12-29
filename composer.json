@@ -45,6 +45,7 @@
         "fluentdom/fluentdom": "~5.3",
         "amphp/artax": "~2.0",
         "zendframework/zend-eventmanager": "^3.0",
-        "amphp/dns": "dev-fix/udp-recvfrom as v0.8.11"
+        "amphp/dns": "dev-fix/udp-recvfrom as v0.8.11",
+        "alom/graphviz": "~1.1"
     }
 }

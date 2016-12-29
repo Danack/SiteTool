@@ -8,5 +8,5 @@ use SiteTool\UrlToCheck;
 
 interface ContentTypeEvent
 {
-    function htmlReceived(Response $response, UrlToCheck $urlToCheck);
+    //function htmlReceived(Response $response, UrlToCheck $urlToCheck);
 }

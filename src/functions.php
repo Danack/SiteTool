@@ -34,6 +34,31 @@ function createApplication()
 {
     $application = new Application("SiteTool", "1.0.0");
 
+    $graphCommand = new Command('graph:test', 'SiteTool\GraphVizTest::test');
+    $graphCommand->setDescription("Tests graph viz");
+//    $graphCommand->addArgument('initialUrl', InputArgument::REQUIRED, 'The initialUrl to be crawled');
+//    $graphCommand->addOption('jobs', 'j', InputOption::VALUE_OPTIONAL, "How many requests to make at once to a domain", 4);
+//    $graphCommand->addOption('crawlOutput', null, InputOption::VALUE_OPTIONAL, "Where to send error output. Allowed values null, stdout, stderr, or a filename", "crawl_result.txt");
+
+    $application->add($graphCommand);
+    
+    
+    
+    
+    
+
+
+
+    $graphCrawlerCommand = new Command('site:crawl:debug', 'SiteTool\Command\Crawler::debug');
+    $graphCrawlerCommand->setDescription("Tests graph viz for crawler");
+//    $graphCommand->addArgument('initialUrl', InputArgument::REQUIRED, 'The initialUrl to be crawled');
+//    $graphCommand->addOption('jobs', 'j', InputOption::VALUE_OPTIONAL, "How many requests to make at once to a domain", 4);
+//    $graphCommand->addOption('crawlOutput', null, InputOption::VALUE_OPTIONAL, "Where to send error output. Allowed values null, stdout, stderr, or a filename", "crawl_result.txt");
+    $application->add($graphCrawlerCommand);
+    
+    
+    
+    
     $crawlerCommand = new Command('site:crawl', 'SiteTool\Command\Crawler::run');
     $crawlerCommand->setDescription("Crawls a site");
     $crawlerCommand->addArgument('initialUrl', InputArgument::REQUIRED, 'The initialUrl to be crawled');

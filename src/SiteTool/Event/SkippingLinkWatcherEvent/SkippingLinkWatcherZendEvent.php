@@ -4,13 +4,11 @@
 namespace SiteTool\Event\SkippingLinkWatcherEvent;
 
 use SiteTool\Event\SkippingLinkWatcherEvent;
-
 use SiteTool\Processor\Rules;
-use SiteTool\SiteChecker;
-use Zend\EventManager\EventManager;
 use Zend\EventManager\Event;
 use SiteTool\Writer\OutputWriter;
 use SiteTool\Processor\SkippingLinkWatcher;
+use SiteTool\EventManager;
 
 
 class SkippingLinkWatcherZendEvent implements SkippingLinkWatcherEvent
@@ -26,14 +24,13 @@ class SkippingLinkWatcherZendEvent implements SkippingLinkWatcherEvent
         Rules $rules,
         OutputWriter $outputWriter,
         SkippingLinkWatcher $skippingLinkWatcher,
-        OutputWriter $outputWriter,
         $skippingLinkEvent
     ) {
         $this->rules = $rules;
         $this->eventManager = $eventManager;
         $this->outputWriter = $outputWriter;
         $this->skippingLinkWatcher = $skippingLinkWatcher;
-        $eventManager->attach($skippingLinkEvent, [$this, 'skippingLinkEvent']);    
+        $eventManager->attach($skippingLinkEvent, [$this, 'skippingLinkEvent'], 'Log skipped links');
     }
     
     public function skippingLinkEvent(Event $e)
