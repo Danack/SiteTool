@@ -1,11 +1,6 @@
 <?php
 
-
 namespace SiteTool\Writer;
-
-
-
-
 
 class WriterFactory
 {
@@ -25,6 +20,7 @@ class WriterFactory
     function create($outputTypeOrFilename)
     {
         switch ($outputTypeOrFilename) {
+            case null:
             case 'null':
                 return new \SiteTool\Writer\NullWriter();
             case 'stdout':

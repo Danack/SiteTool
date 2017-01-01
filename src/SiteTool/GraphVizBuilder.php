@@ -2,19 +2,27 @@
 
 namespace SiteTool;
 
-class GraphVizTest
+
+function normalizeEventName($eventName)
+{
+    $lastSlashPos = strrpos ($eventName, '\\');
+    if ($lastSlashPos !== false) {
+        return substr($eventName, $lastSlashPos + 1);
+    }
+    return $eventName;
+}
+
+class GraphVizBuilder
 {
     /** @var \Alom\Graphviz\Digraph */
     private $graph;
-    
-    
+
     private $switchParams = [
         'shape' => 'circle',
         //'fixedsize' => true, 
         //'width' => 0.9
     ];
-    
-    
+
     private $eventParams = [
         'shape' => 'box'
     ];
@@ -34,10 +42,10 @@ class GraphVizTest
 
     public function addEventTrigger($eventName, $eventSource)
     {
+        $eventName = normalizeEventName($eventName);
         $this->graph->node($eventName, $this->eventParams);
         $switchParams = $this->switchParams;
         $switchParams['label'] = "<". wordwrap($eventSource, 15, "<br/>") . ">";
-//        $switchParams['label'] = wordwrap($eventSource, 15, "'n");
         $switchParams['_escaped'] = false;
         
         $this->graph->node($eventSource, $switchParams);
@@ -46,6 +54,7 @@ class GraphVizTest
     
     public function addEventListener($eventName, $eventListener)
     {
+        $eventName = normalizeEventName($eventName);
         $this->graph->node($eventName, $this->eventParams);
         $this->graph->node($eventListener, $this->switchParams);
         $this->graph->edge([$eventName, $eventListener]);
@@ -67,7 +76,6 @@ class GraphVizTest
                 //'ranksep' => "5",
 //                'sep' => '0.1',
 //                'esep' => '+5'
-                
             ]
         );
         $this->graph->attr(

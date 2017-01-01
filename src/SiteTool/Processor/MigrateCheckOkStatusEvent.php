@@ -1,17 +1,12 @@
 <?php
 
-namespace SiteTool\Event\MigrateCheckOkStatusEvent;
+namespace SiteTool\Processor;
 
-//use Zend\EventManager\EventManager;
 use Zend\EventManager\Event;
-use SiteTool\SiteChecker;
-use SiteTool\Event\MigrateCheckOkStatusEvent;
 use SiteTool\Processor\MigrateCheckOkStatus;
-
 use SiteTool\EventManager;
 
-
-class MigrateCheckOkStatusZendEvent implements MigrateCheckOkStatusEvent
+class MigrateCheckOkStatusZendEvent
 {
     /** @var MigrateCheckOkStatus  */
     private $migrateCheckOkStatus;
@@ -20,7 +15,7 @@ class MigrateCheckOkStatusZendEvent implements MigrateCheckOkStatusEvent
         EventManager $eventManager,
         MigrateCheckOkStatus $migrateCheckOkStatus
     ) {
-        $eventManager->attach(SiteChecker::RESPONSE_RECEIVED, [$this, 'checkStatusEvent']);
+        $eventManager->attachEvent(SiteChecker::RESPONSE_RECEIVED, [$this, 'checkStatusEvent']);
         $this->migrateCheckOkStatus = $migrateCheckOkStatus;
     }
 

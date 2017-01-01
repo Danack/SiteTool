@@ -13,6 +13,9 @@ class FileWriter implements Writer
     
     public function __construct($filename)
     {
+        if (strlen($filename) == 0) {
+            throw new \Exception("Filename cannot be empty.");
+        }
         $this->filename = $filename;
     }
 

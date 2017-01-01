@@ -1,19 +1,18 @@
 <?php
 
-namespace SiteTool\Event\Data;
+namespace SiteTool\Processor\Data;
 
 use SiteTool\UrlToCheck;
 
-class FoundUrlEventData
+class FoundUrlToFollow
 {
     public $href;
 
     /** @var UrlToCheck */
     public $urlToCheck;
     
-    public function __construct($href, UrlToCheck $urlToCheck)
+    public function __construct(UrlToCheck $urlToCheck)
     {
-        $this->href = $href;
         $this->urlToCheck = $urlToCheck;
     }
 }

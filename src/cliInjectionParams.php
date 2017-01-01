@@ -16,7 +16,7 @@ $shares = [
 
     SiteTool\CrawlerConfig::class,
     SiteTool\ResultReader\StandardResultReader::class,
-    SiteTool\GraphVizTest::class,
+    SiteTool\GraphVizBuilder::class,
 
     Zend\EventManager\EventManager::class,
     
@@ -27,7 +27,7 @@ $shares = [
 $aliases = [
     SiteTool\ResultReader::class => SiteTool\ResultReader\StandardResultReader::class,
     SiteTool\Writer\OutputWriter::class => SiteTool\Writer\OutputWriter\StandardOutputWriter::class,
-    SiteTool\EventManager::class => SiteTool\EventManager\BlahEventManager::class
+    SiteTool\EventManager::class => SiteTool\EventManager\StandardEventManager::class
 ];
 
 // Delegate the creation of types to callables.

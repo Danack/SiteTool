@@ -2,50 +2,45 @@
 
 namespace SiteTool\Processor;
 
-use SiteTool\Processor\Rules;
-use SiteTool\SiteChecker;
-use SiteTool\URLToCheck;
-use Zend\EventManager\EventManager;
-use Zend\EventManager\Event;
+use SiteTool\UrlToCheck;
+use SiteTool\Processor\Data\FoundUrl;
+use SiteTool\EventManager;
+use SiteTool\Processor\Data\HtmlToParse;
 use Amp\Artax\SocketException;
 use FluentDOM\Document;
 use FluentDOM\Element;
-use SiteTool\Event\ParseEvent;
 use SiteTool\Writer\OutputWriter;
 
-class LinkFindingParser
+class ParseHtmlToFindLinks
 {
     private $errors = 0;
-
-    /** @var \Zend\EventManager\EventManager */
-    private $eventManager;
     
+    /** @var callable */
+    private $foundUrlEventTrigger;
+
+    private $switchName = "Parse the HTML to find links";
+
     /** @var \SiteTool\Writer\OutputWriter  */
     private $outputWriter;
     
     public function __construct(
-        OutputWriter $outputWriter//,
-//        EventManager $eventManager,
-//        Rules $rules,
-//        $htmlReceivedEvent,
-//        $foundUrlEvent
+        EventManager $eventManager,
+        OutputWriter $outputWriter
     ) {
-//        $this->eventManager = $eventManager;
-//        $eventManager->attach($htmlReceivedEvent, [$this, 'parseResponseEvent']);
-//        $this->foundUrlEvent = $foundUrlEvent;
-        
         $this->outputWriter = $outputWriter;
+        $eventManager->attachEvent(HtmlToParse::class, [$this, 'parseResponse'], $this->switchName);
+        $this->foundUrlEventTrigger = $eventManager->createTrigger(FoundUrl::class, $this->switchName);
     }
-
 
     /**
      * @param URLToCheck $urlToCheck
      * @param $body
      */
-    function parseResponse(
-        URLToCheck $urlToCheck, $body,
-        ParseEvent $parseEvent)
+    function parseResponse(HtmlToParse $parseHtml)
     {
+        $urlToCheck = $parseHtml->urlToCheck;
+        $body = $parseHtml->response->getBody();
+        
         $ok = false;
         $path = $urlToCheck->getUrl();
 
@@ -53,12 +48,11 @@ class LinkFindingParser
             $document = new Document();
             $body = mb_convert_encoding($body, 'HTML-ENTITIES', 'UTF-8');
             $document->loadHTML($body);
-            $linkClosure = function (Element $element) use ($urlToCheck, $parseEvent) {
+            $linkClosure = function (Element $element) use ($urlToCheck) {
                 $href = $element->getAttribute('href');
                 $href = html_entity_decode($href);
-                
-                //$this->eventManager->trigger($this->foundUrlEvent, null, [$href, $urlToCheck->getUrl()]);
-                $parseEvent->foundUrlEvent($href, $urlToCheck);
+                $fn = $this->foundUrlEventTrigger;
+                $fn(new FoundUrl($href, $urlToCheck));
             };
 
             $document->find('//a')->each($linkClosure);

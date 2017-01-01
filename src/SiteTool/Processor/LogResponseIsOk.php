@@ -1,26 +1,28 @@
 <?php
 
+
 namespace SiteTool\Processor;
 
-use Amp\Artax\Response;
-use SiteTool\SiteChecker;
-use Zend\EventManager\EventManager;
-use Zend\EventManager\Event;
+use SiteTool\EventManager;
 use SiteTool\Writer\OutputWriter;
+use SiteTool\Processor\Data\ResponseReceived;
 
-class SiteCheckOkStatus
+class LogResponseIsOk
 {
-    /** @var OutputWriter  */
-    private $outputWriter;
-    
     public function __construct(
+        EventManager $eventManager,
         OutputWriter $outputWriter
     ) {
+        $this->eventManager = $eventManager;
+        $eventManager->attachEvent(ResponseReceived::class, [$this, 'checkStatus'], 'Log response');
         $this->outputWriter = $outputWriter;
     }
 
-    public function checkStatus(Response $response, $fullURL)
+    public function checkStatus(ResponseReceived $responseReceivedData)
     {
+        $response = $responseReceivedData->response;
+        $fullURL = $responseReceivedData->urlToCheck->getUrl();
+        
         $status = $response->getStatus();
         if ($status === 200) {
             $this->outputWriter->write(
