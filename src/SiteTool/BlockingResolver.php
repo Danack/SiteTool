@@ -15,7 +15,6 @@ class BlockingResolver implements Resolver
      */
     public function resolve($name, array $options = [])
     {
-        echo "Lookup $name \n";
         $records = dns_get_record($name, DNS_ANY);
         $result = [];
         foreach ($records as $record) {

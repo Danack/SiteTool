@@ -41,16 +41,18 @@ class Crawler
         }
     }
 
-    public function debug(GraphVizBuilder $graphVizTest)
-    {
-        $graphVizTest->finalize();
-    }
-
     public function run(
         EventManager $eventManager,
         CrawlerConfig $crawlerConfig,
-        OutputWriter $outputWriter
+        OutputWriter $outputWriter,
+        GraphVizBuilder $graphVizBuilder,
+        $graph
     ) {
+        if ($graph) {
+            $graphVizBuilder->finalize();
+            return;
+        }
+        
         $firstUrlToCheck = new URLToCheck('http://' . $crawlerConfig->domainName . $crawlerConfig->path, '/');
         $foundUrlToFollow = new FoundUrlToFollow($firstUrlToCheck);
         $eventManager->trigger(FoundUrlToFollow::class, null, [$foundUrlToFollow]);

@@ -19,12 +19,24 @@ class GraphVizBuilder
 
     private $switchParams = [
         'shape' => 'circle',
+        //'shape' => 'box',
         //'fixedsize' => true, 
         //'width' => 0.9
+        'fontsize' => 28,
+        //'margin' => '0.5,0.5',
+        //'fixedsize' => 'shape'
     ];
 
     private $eventParams = [
-        'shape' => 'box'
+        'shape' => 'box',
+        'fontsize' => 28,
+        //'margin' => '0.5,0.5',
+        'margin' => '0.2,0.1',
+        //'fixedsize' => 'shape'
+    ];
+    
+    private $edgeParams = [
+        'penwidth' => '1.5',
     ];
     
     public function __construct()
@@ -49,7 +61,7 @@ class GraphVizBuilder
         $switchParams['_escaped'] = false;
         
         $this->graph->node($eventSource, $switchParams);
-        $this->graph->edge([$eventSource, $eventName]);
+        $this->graph->edge([$eventSource, $eventName], $this->edgeParams);
     }
     
     public function addEventListener($eventName, $eventListener)
@@ -57,7 +69,7 @@ class GraphVizBuilder
         $eventName = normalizeEventName($eventName);
         $this->graph->node($eventName, $this->eventParams);
         $this->graph->node($eventListener, $this->switchParams);
-        $this->graph->edge([$eventName, $eventListener]);
+        $this->graph->edge([$eventName, $eventListener], $this->edgeParams);
     }
 
     public function finalize()
@@ -65,25 +77,36 @@ class GraphVizBuilder
         $this->graph->attr(
             'graph', 
             [
+                'center' => true,
+                'fontsize' => 28,
                 'label' => 'Switches are circles. Events are boxes.',
-                'fontsize' => 12,
-                //'splines' => 'polyline',
-                //'overlap' => 'voronoi'
-                //'mindist' => 1.5,
-                'overlap' => 'scale',
-                //'packMode' => 'clust',
-                //'smoothType' => 'spring'
-                //'ranksep' => "5",
-//                'sep' => '0.1',
-//                'esep' => '+5'
+                'margin' => "0.5,0.5",
+                'mindist' => 1.0,
+                'packMode' => 'node',
+                'nodesep' => 0.9,
+                'overlap' => 'voronoi',
+                'ranksep' => 0.1,
+                'smoothing' => "triangle",
+                'splines' => 'true',
+                //   Values are "none", "avg_dist", "graph_dist", "power_dist", "rng", "spring" and "triangle".
             ]
         );
         $this->graph->attr(
             'edge', 
             [
-                'splines' => 'curved'
+                'splines' => 'curved',
+                'weight' => 45
             ]
         );
+
+        $this->graph->attr(
+            'node', 
+            [
+                'splines' => 'curved',
+            ]
+        );
+        
+
 
         $data = $this->graph->render();
         file_put_contents(__DIR__ . "/../../graph.dot", $data);
@@ -93,7 +116,7 @@ class GraphVizBuilder
 //            'neato',
 //            'twopi',
             'circo',
-//            'fdp',
+            //'fdp',
 //            'sfdp',
 //            //'patchwork',
 //            'osage',
