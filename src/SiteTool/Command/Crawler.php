@@ -4,7 +4,7 @@ namespace SiteTool\Command;
 
 use Auryn\Injector;
 use SiteTool\CrawlerConfig;
-use SiteTool\URLToCheck;
+use SiteTool\UrlToCheck;
 use SiteTool\Writer\OutputWriter;
 use SiteTool\Processor\CheckContentTypeIsHtml;
 use SiteTool\Processor\FetchUrl;
@@ -53,7 +53,7 @@ class Crawler
             return;
         }
         
-        $firstUrlToCheck = new URLToCheck('http://' . $crawlerConfig->domainName . $crawlerConfig->path, '/');
+        $firstUrlToCheck = new UrlToCheck('http://' . $crawlerConfig->domainName . $crawlerConfig->path, '/');
         $foundUrlToFollow = new FoundUrlToFollow($firstUrlToCheck);
         $eventManager->trigger(FoundUrlToFollow::class, null, [$foundUrlToFollow]);
         $outputWriter->write(OutputWriter::PROGRESS, "Start.");
