@@ -95,7 +95,7 @@ function createCrawlerConfig($initialUrl)
     $urlParts = parse_url($initialUrl);
     if (array_key_exists('host', $urlParts) === false) {
         echo "Could not determine domain name from " . $initialUrl . "\n";
-        echo "Please include the schema like http://example.com";
+        echo "Please include the schema like http://example.com \n";
         exit(-1);
     }
 
