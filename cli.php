@@ -7,16 +7,16 @@ use Tier\CLIFunction;
 ini_set('display_errors', 'on');
 error_reporting(E_ALL);
 
-require_once(__DIR__.'/../vendor/autoload.php');
+require_once(__DIR__.'/./vendor/autoload.php');
 
 CLIFunction::setupErrorHandlers();
 
 $injector = new Injector();
-$standardInjectionParams = require __DIR__."/../src/injectionParams.php";
+$standardInjectionParams = require __DIR__."/./src/injectionParams.php";
 
 /** @var $injectionParams \AurynConfig\InjectionParams */
 $standardInjectionParams->addToInjector($injector);
-$cliInjectionParams = require __DIR__."/cliInjectionParams.php";
+$cliInjectionParams = require __DIR__."/src/cliInjectionParams.php";
 
 /** @var $cliInjectionParams \AurynConfig\InjectionParams */
 $cliInjectionParams->addToInjector($injector);
@@ -31,7 +31,7 @@ define('TIER_ROUTING', 10);
 libxml_use_internal_errors(true);
 
 // Work around the flaky DNS lookup.
-\Amp\Dns\resolver(new \SiteTool\BlockingResolver());
+//\Amp\Dns\resolver(new \SiteTool\BlockingResolver());
 
 $tierApp->addExecutable(TIER_ROUTING, 'Tier\Bridge\ConsoleRouter::routeCommand');
 

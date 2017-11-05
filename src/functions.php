@@ -43,6 +43,30 @@ function createApplication()
     addOutputOptionsToCommand($crawlerCommand);
     $application->add($crawlerCommand);
 
+
+
+    $crawlerCommand = new Command('site:debug', 'SiteTool\Command\Debug::run');
+    $crawlerCommand->setDescription("Debugs new functionality");
+    $crawlerCommand->addArgument('initialUrl', InputArgument::REQUIRED, 'The initialUrl to be crawled');
+    $crawlerCommand->addOption('jobs', 'j', InputOption::VALUE_OPTIONAL, "How many requests to make at once to a domain", 4);
+    $crawlerCommand->addOption('graph', 'g', InputOption::VALUE_NONE, "Instead of executing, diagram the apps events", null);
+    $crawlerCommand->addOption('crawlOutput', null, InputOption::VALUE_OPTIONAL, "Where to send error output. Allowed values null, stdout, stderr, or a filename", "crawl_result.txt");
+    addOutputOptionsToCommand($crawlerCommand);
+    $application->add($crawlerCommand);
+
+
+
+
+    $crawlerCommand = new Command('site:crawl_validate', 'SiteTool\Command\CrawlerWithValidator::run');
+    $crawlerCommand->setDescription("Crawls a site and validates against the w3c");
+    $crawlerCommand->addArgument('initialUrl', InputArgument::REQUIRED, 'The initialUrl to be crawled');
+    $crawlerCommand->addOption('jobs', 'j', InputOption::VALUE_OPTIONAL, "How many requests to make at once to a domain", 4);
+    $crawlerCommand->addOption('graph', 'g', InputOption::VALUE_NONE, "Instead of executing, diagram the apps events", null);
+    $crawlerCommand->addOption('crawlOutput', null, InputOption::VALUE_OPTIONAL, "Where to send error output. Allowed values null, stdout, stderr, or a filename", "crawl_result.txt");
+    addOutputOptionsToCommand($crawlerCommand);
+    $application->add($crawlerCommand);
+
+
     $statusCheckCommand = new Command('site:check', 'SiteTool\Command\Check::run');
     $statusCheckCommand->setDescription("Check that all the urls from a site are still ok.");
     $statusCheckCommand->addOption('jobs', 'j', InputOption::VALUE_OPTIONAL, "How many requests to make at once to a domain", 4);
