@@ -3,9 +3,6 @@
 
 namespace SiteToolTest\Writer;
 
-use SiteTool\SiteToolException;
-use function Amp\File\open;
-use function Amp\resolve;
 use SiteTool\Writer\FileWriter;
 use SiteToolTest\BaseTestCase;
 
