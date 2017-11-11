@@ -12,71 +12,80 @@ class RulesTest // extends \PHPUnit_Framework_TestCase
     extends \SiteToolTest\BaseTestCase
 {
     
-    private function createRules($domainName)
+//    private function createRules($domainName)
+//    {
+//        $crawlerConfig = new CrawlerConfig(
+//            'http',
+//            $domainName,
+//            '/'
+//        );
+//        return new Rules(
+//            $crawlerConfig,
+//            new NullStatusWriter(),
+//            new NullErrorWriter()
+//        );
+//    }
+//
+//    /**
+//     * @group debug
+//     */
+//    public function testWat()
+//    {
+//        $href = "http://www.example.com/foo/bar/quux";
+//        $rules = $this->createRules("example.com");
+//        $urlToCheck = $rules->getUrlToCheck($href, '/');
+//        $this->assertNotNull($urlToCheck);
+//    }
+//
+//    public function doNotFollowLinks()
+//    {
+//        return [
+//            ['www.example.com', "https://www.facebook.com/sciencefocus"],
+//            ['www.example.com', "sms:012345"],
+//            ['www.example.com', "skype:012345"],
+//            ['www.example.com', "http://www.example.comfoo.bar"],
+//        ];
+//    }
+//
+//    public function doFollowLinks()
+//    {
+//        return [
+//            ["example.com", "//example.com/just-in/foo.html"],
+//        ];
+//    }
+//
+//    /**
+//     * @dataProvider doFollowLinks
+//     */
+//    public function testSchemaPath($domainName, $href)
+//    {
+//        $rules = $this->createRules($domainName);
+//        $urlToCheck = $rules->getUrlToCheck($href, '/');
+//        $this->assertNotNull($urlToCheck);
+//        $this->assertEquals("http://$domainName/just-in/foo.html", $urlToCheck->getUrl());
+//    }
+//
+//
+//    /**
+//     * @dataProvider doNotFollowLinks
+//     */
+//    public function testDontFollowLinkToOtherSite($domainName, $href)
+//    {
+//        $rules = $this->createRules($domainName);
+//
+//        $urlToCheck = $rules->getUrlToCheck($href, '/');
+//        $this->assertNull($urlToCheck);
+//    }
+    public function testNeedsRefactoring()
     {
-        $crawlerConfig = new CrawlerConfig(
-            'http',
-            $domainName,
-            '/'
-        );
-        return new Rules(
-            $crawlerConfig,
-            new NullStatusWriter(),
-            new NullErrorWriter()
-        );
-    }
+        $message = <<< TEXT
+The rules are currently embbeded in the class \SiteTool\EventProcessor\ShouldUrlFoundBeFollowed
+They need to be refactored to be in a separate class again.
+TEXT;
 
-    /**
-     * @group debug
-     */
-    public function testWat() 
-    {
-        $href = "http://www.example.com/foo/bar/quux";
-        $rules = $this->createRules("example.com");
-        $urlToCheck = $rules->getUrlToCheck($href, '/');
-        $this->assertNotNull($urlToCheck);
-    }
 
-    public function doNotFollowLinks()
-    {
-        return [
-            ['www.example.com', "https://www.facebook.com/sciencefocus"],
-            ['www.example.com', "sms:012345"],
-            ['www.example.com', "skype:012345"],
-            ['www.example.com', "http://www.example.comfoo.bar"],
-        ];
+        $this->markTestSkipped($message);
     }
-
-    public function doFollowLinks()
-    {
-        return [
-            ["example.com", "//example.com/just-in/foo.html"],
-        ];
-    }
-
-    /**
-     * @dataProvider doFollowLinks
-     */
-    public function testSchemaPath($domainName, $href)
-    {
-        $rules = $this->createRules($domainName);
-        $urlToCheck = $rules->getUrlToCheck($href, '/');
-        $this->assertNotNull($urlToCheck);
-        $this->assertEquals("http://$domainName/just-in/foo.html", $urlToCheck->getUrl());
-    }
-    
-
-    /**
-     * @dataProvider doNotFollowLinks
-     */
-    public function testDontFollowLinkToOtherSite($domainName, $href)
-    {
-        $rules = $this->createRules($domainName);
-
-        $urlToCheck = $rules->getUrlToCheck($href, '/');
-        $this->assertNull($urlToCheck);
-    }
-    
 }
 
 

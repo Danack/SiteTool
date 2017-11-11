@@ -81,7 +81,7 @@ class ShouldUrlFoundBeFollowed
         $fn(new FoundUrlToSkip($href, $host));
     }
 
-    function foundUrlToFollow(UrlToCheck $urlToCheck)
+    public function foundUrlToFollow(UrlToCheck $urlToCheck)
     {
         $fn = $this->foundUrlToFollowTrigger;
         $fn(new FoundUrlToFollow($urlToCheck));

@@ -3,7 +3,9 @@
     <description>Customised coding standard.</description>
     <arg name="tab-width" value="4"/>
 
-
+    <rule ref="Squiz.WhiteSpace.ScopeClosingBrace.ContentBefore">
+        <exclude-pattern>*/Command/*</exclude-pattern> <!-- files have empty closure -->
+    </rule>
 
     <rule ref="PSR2">
 
@@ -16,6 +18,11 @@
 
         <!-- This makes co-ordinate pairs hard to read -->
         <exclude name="PSR2.Methods.FunctionCallSignature.MultipleArguments" />
+
+        <!-- Makes code harder to read -->
+        <exclude name="Squiz.Functions.MultiLineFunctionDeclaration.UseOneParamPerLine" />
+
+
     </rule>
 
     <rule ref="Generic.WhiteSpace.ScopeIndent">

@@ -36,7 +36,7 @@ class ParseHtmlToFindLinks
      * @param URLToCheck $urlToCheck
      * @param $body
      */
-    function parseResponse(HtmlToParse $parseHtml)
+    public function parseResponse(HtmlToParse $parseHtml)
     {
         $urlToCheck = $parseHtml->urlToCheck;
         $body = $parseHtml->response->getBody();
@@ -68,7 +68,7 @@ class ParseHtmlToFindLinks
                 $message
             );
         }
-        catch(\InvalidArgumentException $iae) {
+        catch (\InvalidArgumentException $iae) {
             $message = "Fluent dom exception on $path - ".$iae->getMessage(). " Exception type is ".get_class($iae);
             $this->outputWriter->write(
                 \SiteTool\Writer\OutputWriter::CRAWL_RESULT,

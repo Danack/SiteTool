@@ -36,7 +36,7 @@ class CheckResponseIsOk
      * @return null|void
      * @throws \Exception
      */
-    function analyzeResult(ResponseReceived $responseReceivedData)
+    public function analyzeResult(ResponseReceived $responseReceivedData)
     {
         $response = $responseReceivedData->response;
         $urlToCheck = $responseReceivedData->urlToCheck;

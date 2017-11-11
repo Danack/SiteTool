@@ -9,7 +9,7 @@ class CrawlerConfig
     public $domainName;
     public $path = '/';
 
-    function __construct($schema, $domainName,  $path)
+    public function __construct($schema, $domainName, $path)
     {
         $this->schema = $schema;
         $this->domainName = $domainName;

@@ -13,7 +13,7 @@ class HtmlToParse
     /** @var UrlToCheck  */
     public $urlToCheck;
 
-    function __construct(UrlToCheck $urlToCheck, Response $response)
+    public function __construct(UrlToCheck $urlToCheck, Response $response)
     {
         $this->response = $response;
         $this->urlToCheck = $urlToCheck;

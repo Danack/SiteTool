@@ -17,7 +17,6 @@ use SiteTool\GraphVizBuilder;
 use SiteTool\Event\FoundUrlToFollow;
 use Zend\EventManager\EventManager;
 
-
 class Crawler
 {
     private $relays = [];
@@ -58,7 +57,7 @@ class Crawler
         $eventManager->trigger(FoundUrlToFollow::class, null, [$foundUrlToFollow]);
         $outputWriter->write(OutputWriter::PROGRESS, "Start.");
 
-        \Amp\run(function() {});
+        \Amp\run(function () {});
         $outputWriter->write(OutputWriter::PROGRESS, "fin.");
     }
 }

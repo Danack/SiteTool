@@ -1,11 +1,9 @@
 <?php
 
-
 namespace SiteTool\Event;
 
 use Amp\Artax\Response;
 use SiteTool\UrlToCheck;
-
 
 class CheckResponseType
 {
@@ -14,8 +12,8 @@ class CheckResponseType
 
     public function __construct(
         Response $response,
-        UrlToCheck $urlToCheck)
-    {
+        UrlToCheck $urlToCheck
+    ) {
         $this->response = $response;
         $this->urlToCheck = $urlToCheck;
     }

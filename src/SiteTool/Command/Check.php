@@ -38,9 +38,6 @@ class Check
         $this->artaxClient = $artaxClient;
     }
 
-    /**
-     * 
-     */
     public function run(Injector $injector)
     {
         $plugins[] = $injector->make(\SiteTool\EventProcessor\SiteCheckOkStatus::class);
@@ -80,9 +77,6 @@ class Check
         $this->eventManager->trigger(SiteChecker::RESPONSE_RECEIVED, null, [$response, $fullURL]);
     }
 
-    /**
-     * 
-     */
     public function check()
     {
         $results = $this->resultReader->readAll();
@@ -98,7 +92,7 @@ class Check
                 "Checking " . $result->url
             );
 
-            $analyzeResult = function(
+            $analyzeResult = function (
                 \Exception $e = null,
                 Response $response = null
             ) use ($url) {

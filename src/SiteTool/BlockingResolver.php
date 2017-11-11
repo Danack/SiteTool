@@ -34,7 +34,6 @@ class BlockingResolver implements Resolver
         }
 
         throw new ResolutionException("Failed to resolve " . $name);
-    
     }
 
     /**
@@ -45,4 +44,3 @@ class BlockingResolver implements Resolver
         return $this->resolve($name);
     }
 }
-

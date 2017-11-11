@@ -10,6 +10,12 @@ class FileWriterTest extends BaseTestCase
 {
     const FILENAME = TEMP_PATH . "/output.txt";
 
+    public function setup()
+    {
+        @mkdir(dirname(self::FILENAME), 0755, true);
+        parent::setup();
+    }
+
     public function tearDown()
     {
         parent::tearDown();
@@ -21,8 +27,8 @@ class FileWriterTest extends BaseTestCase
 
     public function testThrowsOnEmptyFilename()
     {
-        $this->setExpectedException(\Exception::class, "Filename cannot be empty.");
-
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage("Filename cannot be empty.");
         new FileWriter('');
     }
 

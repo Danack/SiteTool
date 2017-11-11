@@ -2,12 +2,8 @@
 
 use AurynConfig\InjectionParams;
 
-
 // These classes will only be created  by the injector once
 $shares = [
-    SiteTool\SiteChecker::class,
-    SiteTool\EventProcessor\Rules::class,
-
     SiteTool\CrawlerConfig::class,
     SiteTool\Writer\FileWriter::class,
     SiteTool\Writer\NullWriter::class,
@@ -19,7 +15,6 @@ $shares = [
     SiteTool\GraphVizBuilder::class,
 
     Zend\EventManager\EventManager::class,
-    
 ];
 
 // Alias interfaces (or classes) to the actual types that should be used 

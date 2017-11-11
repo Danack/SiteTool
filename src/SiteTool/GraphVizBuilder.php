@@ -2,10 +2,9 @@
 
 namespace SiteTool;
 
-
 function normalizeEventName($eventName)
 {
-    $lastSlashPos = strrpos ($eventName, '\\');
+    $lastSlashPos = strrpos($eventName, '\\');
     if ($lastSlashPos !== false) {
         return substr($eventName, $lastSlashPos + 1);
     }
@@ -20,7 +19,7 @@ class GraphVizBuilder
     private $switchParams = [
         'shape' => 'circle',
         //'shape' => 'box',
-        //'fixedsize' => true, 
+        //'fixedsize' => true,
         //'width' => 0.9
         'fontsize' => 28,
         //'margin' => '0.5,0.5',
@@ -75,7 +74,7 @@ class GraphVizBuilder
     public function finalize()
     {
         $this->graph->attr(
-            'graph', 
+            'graph',
             [
                 'center' => true,
                 'fontsize' => 28,
@@ -92,7 +91,7 @@ class GraphVizBuilder
             ]
         );
         $this->graph->attr(
-            'edge', 
+            'edge',
             [
                 'splines' => 'curved',
                 'weight' => 45
@@ -100,13 +99,11 @@ class GraphVizBuilder
         );
 
         $this->graph->attr(
-            'node', 
+            'node',
             [
                 'splines' => 'curved',
             ]
         );
-        
-
 
         $data = $this->graph->render();
         file_put_contents(__DIR__ . "/../../graph.dot", $data);

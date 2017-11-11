@@ -41,11 +41,10 @@ class W3CValidator
 
     public static function buildQueryUrl($uri)
     {
-        $uri = self::BASE_URL . '?' . http_build_query(array(
-                    'output'=> 'soap12',
-                    'uri'   => $uri,
-                )
-            );
+        $uri = self::BASE_URL . '?' . http_build_query([
+            'output'=> 'soap12',
+            'uri'   => $uri,
+        ]);
 
         // 'User-Agent: Danack SiteTool', // This header is required by the W3C API
 
@@ -64,7 +63,7 @@ class W3CValidator
     public function __construct($output)
     {
         // Parse XML document
-        $this->document = simplexml_load_string($output, NULL, NULL, 'http://schemas.xmlsoap.org/soap/envelope/');
+        $this->document = simplexml_load_string($output, null, null, 'http://schemas.xmlsoap.org/soap/envelope/');
         $this->document->registerXPathNamespace('env', 'http://www.w3.org/2003/05/soap-envelope/');
         $this->document->registerXPathNamespace('m', 'http://www.w3.org/2005/10/markup-validator');
     }
@@ -137,9 +136,8 @@ class W3CValidator
         $list       = array();
         $elements   = $this->getPaths('//m:error');
 
-        foreach($elements as $i => $element) { /* @var $item SimpleXMLElement */
-
-            if($i == $limit) {
+        foreach ($elements as $i => $element) { /* @var $item SimpleXMLElement */
+            if ($i == $limit) {
                 break; // Reached limit number of warnings to return
             }
 
@@ -175,9 +173,9 @@ class W3CValidator
         $list       = array();
         $elements   = $this->getPaths('//m:warning');
 
-        foreach($elements as $i => $element) { /* @var $item SimpleXMLElement */
+        foreach ($elements as $i => $element) { /* @var $item SimpleXMLElement */
 
-            if($i == $limit) {
+            if ($i == $limit) {
                 break; // Reached limit number of warnings to return
             }
 
@@ -228,11 +226,9 @@ class W3CValidator
      * Get report
      *
      * Output page error information report
-     *
-     * @param string $format
-     * @return string
      */
-    public function getReport($format = self::_OUTPUT_FORMAT_CLI) {
+    public function getReport()
+    {
         $output = array(
             'URI'           => $this->getURI(),
             'Validity'      => $this->isValid(),

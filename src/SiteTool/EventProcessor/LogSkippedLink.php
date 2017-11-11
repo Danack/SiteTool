@@ -7,7 +7,6 @@ use SiteTool\Writer\OutputWriter;
 use SiteTool\EventManager;
 use SiteTool\Event\FoundUrlToSkip;
 
-
 class LogSkippedLink
 {
     private $skippedHrefs = [];

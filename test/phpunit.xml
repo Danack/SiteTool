@@ -5,7 +5,7 @@
     </php>
 
     <testsuites>
-        <testsuite name="SiteTool Test Suite">
+        <testsuite name="Site Tool Test Suite">
             <directory>../test/</directory>
             <exclude>BaseTestCase.php</exclude> <!-- This doens't seem to work-->
         </testsuite>

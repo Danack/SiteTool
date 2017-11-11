@@ -3,12 +3,10 @@
 namespace SiteTool\EventProcessor;
 
 use SiteTool\EventManager;
-use SiteTool\Event\CheckResponseType;
 use SiteTool\Event\HtmlToParse;
 use SiteTool\Event\ResponseOk;
 
-
-class CheckContentTypeIsHtml 
+class CheckContentTypeIsHtml
 {
     /** @var callable  */
     private $htmlReceivedTrigger;
@@ -17,7 +15,7 @@ class CheckContentTypeIsHtml
     
     public function __construct(EventManager $eventManager)
     {
-        $eventManager->attachEvent(ResponseOk::class , [$this, 'checkResponseType'], $this->switchName);
+        $eventManager->attachEvent(ResponseOk::class, [$this, 'checkResponseType'], $this->switchName);
         $this->htmlReceivedTrigger = $eventManager->createTrigger(HtmlToParse::class, $this->switchName);
     }
 
@@ -25,8 +23,8 @@ class CheckContentTypeIsHtml
      * @param ResponseOk $checkResponseType
      * @throws \Exception
      */
-    public function checkResponseType(ResponseOk $checkResponseType) {
-        
+    public function checkResponseType(ResponseOk $checkResponseType)
+    {
         $response = $checkResponseType->response;
         $urlToCheck = $checkResponseType->urlToCheck;
         
@@ -50,4 +48,3 @@ class CheckContentTypeIsHtml
         }
     }
 }
-

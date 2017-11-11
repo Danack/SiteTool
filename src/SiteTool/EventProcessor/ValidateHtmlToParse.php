@@ -52,7 +52,7 @@ class ValidateHtmlToParse
         file_put_contents($tmpfname, $html);
         $output = [];
         $return_var = 0;
-        exec("tidy -e -q " . $tmpfname . " 2>&1" , $output, $return_var);
+        exec("tidy -e -q " . $tmpfname . " 2>&1", $output, $return_var);
         unlink($tmpfname);
 
         if ($return_var !== 0) {

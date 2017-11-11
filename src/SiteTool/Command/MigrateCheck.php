@@ -37,7 +37,7 @@ class MigrateCheck
         OutputWriter $outputWriter,
         EventManager $eventManager
     ) {
-        $this->oldDomainName = $oldDomainName; 
+        $this->oldDomainName = $oldDomainName;
         $this->newDomainName = $newDomainName;
         $this->resultReader = $resultReader;
         $this->eventManager = $eventManager;
@@ -45,9 +45,6 @@ class MigrateCheck
         $this->artaxClient = $artaxClient;
     }
 
-    /**
-     * 
-     */
     public function run(Injector $injector)
     {
         $plugins[] = $injector->make(\SiteTool\EventProcessor\MigrateCheckOkStatus::class);
@@ -87,9 +84,6 @@ class MigrateCheck
         $this->eventManager->trigger(SiteChecker::RESPONSE_RECEIVED, null, [$response, $fullURL]);
     }
 
-    /**
-     * 
-     */
     public function check()
     {
         $results = $this->resultReader->readAll();
@@ -105,7 +99,7 @@ class MigrateCheck
             );
             $promise = $this->artaxClient->request($newUrl);
 
-            $analyzeResult = function(
+            $analyzeResult = function (
                 \Exception $e = null,
                 Response $response = null
             ) use ($newUrl) {

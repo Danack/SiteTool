@@ -2,13 +2,15 @@
 
 namespace SiteToolTest;
 
+use PHPUnit\Framework\TestCase;
+
 /**
  * Class BaseTestCase
  *
  * Allows checking that no code has output characters, or left the output buffer in a bad state.
  *
  */
-class BaseTestCase extends \PHPUnit_Framework_TestCase
+class BaseTestCase extends TestCase
 {
     private $startLevel = null;
 

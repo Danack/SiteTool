@@ -26,8 +26,20 @@ function createArtaxClient($jobs)
 
 function addOutputOptionsToCommand(Command $command)
 {
-    $command->addOption('statusOutput', null, InputOption::VALUE_OPTIONAL, "Where to send status output. Allowed values null, stdout, stderr, or a filename", 'stdout');
-    $command->addOption('errorOutput', null, InputOption::VALUE_OPTIONAL, "Where to send error output. Allowed values null, stdout, stderr, or a filename", "error.txt");
+    $command->addOption(
+        'statusOutput',
+        null,
+        InputOption::VALUE_OPTIONAL,
+        "Where to send status output. Allowed values null, stdout, stderr, or a filename",
+        'stdout'
+    );
+    $command->addOption(
+        'errorOutput',
+        null,
+        InputOption::VALUE_OPTIONAL,
+        "Where to send error output. Allowed values null, stdout, stderr, or a filename",
+        "error.txt"
+    );
 }
 
 function createApplication()
@@ -36,10 +48,32 @@ function createApplication()
 
     $crawlerCommand = new Command('site:crawl', 'SiteTool\Command\Crawler::run');
     $crawlerCommand->setDescription("Crawls a site");
-    $crawlerCommand->addArgument('initialUrl', InputArgument::REQUIRED, 'The initialUrl to be crawled');
-    $crawlerCommand->addOption('jobs', 'j', InputOption::VALUE_OPTIONAL, "How many requests to make at once to a domain", 4);
-    $crawlerCommand->addOption('graph', 'g', InputOption::VALUE_NONE, "Instead of executing, diagram the apps events", null);
-    $crawlerCommand->addOption('crawlOutput', null, InputOption::VALUE_OPTIONAL, "Where to send error output. Allowed values null, stdout, stderr, or a filename", "crawl_result.txt");
+    $crawlerCommand->addArgument(
+        'initialUrl',
+        InputArgument::REQUIRED,
+        'The initialUrl to be crawled'
+    );
+    $crawlerCommand->addOption(
+        'jobs',
+        'j',
+        InputOption::VALUE_OPTIONAL,
+        "How many requests to make at once to a domain",
+        4
+    );
+    $crawlerCommand->addOption(
+        'graph',
+        'g',
+        InputOption::VALUE_NONE,
+        "Instead of executing, diagram the apps events",
+        null
+    );
+    $crawlerCommand->addOption(
+        'crawlOutput',
+        null,
+        InputOption::VALUE_OPTIONAL,
+        "Where to send error output. Allowed values null, stdout, stderr, or a filename",
+        "crawl_result.txt"
+    );
     addOutputOptionsToCommand($crawlerCommand);
     $application->add($crawlerCommand);
 
@@ -48,9 +82,27 @@ function createApplication()
     $crawlerCommand = new Command('site:debug', 'SiteTool\Command\Debug::run');
     $crawlerCommand->setDescription("Debugs new functionality");
     $crawlerCommand->addArgument('initialUrl', InputArgument::REQUIRED, 'The initialUrl to be crawled');
-    $crawlerCommand->addOption('jobs', 'j', InputOption::VALUE_OPTIONAL, "How many requests to make at once to a domain", 4);
-    $crawlerCommand->addOption('graph', 'g', InputOption::VALUE_NONE, "Instead of executing, diagram the apps events", null);
-    $crawlerCommand->addOption('crawlOutput', null, InputOption::VALUE_OPTIONAL, "Where to send error output. Allowed values null, stdout, stderr, or a filename", "crawl_result.txt");
+    $crawlerCommand->addOption(
+        'jobs',
+        'j',
+        InputOption::VALUE_OPTIONAL,
+        "How many requests to make at once to a domain",
+        4
+    );
+    $crawlerCommand->addOption(
+        'graph',
+        'g',
+        InputOption::VALUE_NONE,
+        "Instead of executing, diagram the apps events",
+        null
+    );
+    $crawlerCommand->addOption(
+        'crawlOutput',
+        null,
+        InputOption::VALUE_OPTIONAL,
+        "Where to send error output. Allowed values null, stdout, stderr, or a filename",
+        "crawl_result.txt"
+    );
     addOutputOptionsToCommand($crawlerCommand);
     $application->add($crawlerCommand);
 
@@ -59,29 +111,89 @@ function createApplication()
 
     $crawlerCommand = new Command('site:crawl_validate', 'SiteTool\Command\CrawlerWithValidator::run');
     $crawlerCommand->setDescription("Crawls a site and validates against the w3c");
-    $crawlerCommand->addArgument('initialUrl', InputArgument::REQUIRED, 'The initialUrl to be crawled');
-    $crawlerCommand->addOption('jobs', 'j', InputOption::VALUE_OPTIONAL, "How many requests to make at once to a domain", 4);
-    $crawlerCommand->addOption('graph', 'g', InputOption::VALUE_NONE, "Instead of executing, diagram the apps events", null);
-    $crawlerCommand->addOption('crawlOutput', null, InputOption::VALUE_OPTIONAL, "Where to send error output. Allowed values null, stdout, stderr, or a filename", "crawl_result.txt");
+    $crawlerCommand->addArgument(
+        'initialUrl',
+        InputArgument::REQUIRED,
+        'The initialUrl to be crawled'
+    );
+    $crawlerCommand->addOption(
+        'jobs',
+        'j',
+        InputOption::VALUE_OPTIONAL,
+        "How many requests to make at once to a domain",
+        4
+    );
+    $crawlerCommand->addOption(
+        'graph',
+        'g',
+        InputOption::VALUE_NONE,
+        "Instead of executing, diagram the apps events",
+        null
+    );
+    $crawlerCommand->addOption(
+        'crawlOutput',
+        null,
+        InputOption::VALUE_OPTIONAL,
+        "Where to send error output. Allowed values null, stdout, stderr, or a filename",
+        "crawl_result.txt"
+    );
     addOutputOptionsToCommand($crawlerCommand);
     $application->add($crawlerCommand);
 
 
     $statusCheckCommand = new Command('site:check', 'SiteTool\Command\Check::run');
     $statusCheckCommand->setDescription("Check that all the urls from a site are still ok.");
-    $statusCheckCommand->addOption('jobs', 'j', InputOption::VALUE_OPTIONAL, "How many requests to make at once to a domain", 4);
-    $statusCheckCommand->addOption('crawlOutput', null, InputOption::VALUE_OPTIONAL, "Where to send error output. Allowed values null, stdout, stderr, or a filename", "crawl_result.txt");
-    $statusCheckCommand->addOption('checkOutput', null, InputOption::VALUE_OPTIONAL, "Where to send check output. Allowed values null, stdout, stderr, or a filename", 'check_result.txt');
+    $statusCheckCommand->addOption(
+        'jobs',
+        'j',
+        InputOption::VALUE_OPTIONAL,
+        "How many requests to make at once to a domain",
+        4
+    );
+    $statusCheckCommand->addOption(
+        'crawlOutput',
+        null,
+        InputOption::VALUE_OPTIONAL,
+        "Where to send error output. Allowed values null, stdout, stderr, or a filename",
+        "crawl_result.txt"
+    );
+    $statusCheckCommand->addOption(
+        'checkOutput',
+        null,
+        InputOption::VALUE_OPTIONAL,
+        "Where to send check output. Allowed values null, stdout, stderr, or a filename", 'check_result.txt'
+    );
     addOutputOptionsToCommand($statusCheckCommand);
     $application->add($statusCheckCommand);
 
 //    $migrateCheckCommand = new Command('site:migratecheck', 'SiteTool\Command\MigrateCheck::run');
-//    $migrateCheckCommand->setDescription("Check that all the urls from an old site are migrated to a new domain correctly.");
+//    $migrateCheckCommand->setDescription(
+//      "Check that all the urls from an old site are migrated to a new domain correctly."
+//      );
 //    $migrateCheckCommand->addArgument('oldDomainName', InputArgument::REQUIRED, 'The old domain name to be crawled');
 //    $migrateCheckCommand->addArgument('newDomainName', InputArgument::REQUIRED, 'The new domain name to be crawled');
-//    $migrateCheckCommand->addOption('jobs', 'j', InputOption::VALUE_OPTIONAL, "How many requests to make at once to a domain", 4);
-//    $migrateCheckCommand->addOption('crawlOutput', null, InputOption::VALUE_OPTIONAL, "Where read the crawl result from. Allowed values null, stdout, stderr, file", 'crawl_result.txt');
-//    $migrateCheckCommand->addOption('migrationOutput', null, InputOption::VALUE_OPTIONAL, "Where to send migration check output. Allowed values null, stdout, stderr, or a filename", 'migration_result.txt');
+//    $migrateCheckCommand->addOption(
+//      'jobs',
+//      'j',
+//      InputOption::VALUE_OPTIONAL,
+//      "How many requests to make at once to a domain",
+//      4
+//    );
+//    $migrateCheckCommand->addOption(
+//        'crawlOutput',
+//        null,
+//        InputOption::VALUE_OPTIONAL,
+//        "Where read the crawl result from. Allowed values null, stdout, stderr, file",
+//        'crawl_result.txt'
+//    );
+//    $message = "Where to send migration check output. Allowed values null, stdout, stderr, or a filename";
+//    $migrateCheckCommand->addOption(
+//        'migrationOutput',
+//        null,
+//        InputOption::VALUE_OPTIONAL,
+//        $message,
+//        'migration_result.txt'
+//    );
 //    
 //    addOutputOptionsToCommand($migrateCheckCommand, false);
 //    $application->add($migrateCheckCommand);

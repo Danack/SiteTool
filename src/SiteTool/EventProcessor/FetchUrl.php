@@ -63,7 +63,6 @@ class FetchUrl
 
         $this->count++;
         if ($this->count > $this->maxCount) {
-
             $message = sprintf(
                 "Skipping %s as limit of %d urls has been reached.",
                 $urlToCheck->getUrl(),
@@ -84,7 +83,7 @@ class FetchUrl
     /**
      * @param URLToCheck $urlToCheck
      */
-    function fetchURL(URLToCheck $urlToCheck)
+    public function fetchURL(URLToCheck $urlToCheck)
     {
         $fullURL = $urlToCheck->getUrl();
         echo "$fullURL \n";
@@ -95,7 +94,7 @@ class FetchUrl
         );
         $promise = $this->artaxClient->request($fullURL);
 
-        $analyzeResult = function(
+        $analyzeResult = function (
             \Exception $e = null,
             Response $response = null
         ) use ($urlToCheck, $fullURL) {
@@ -106,7 +105,7 @@ class FetchUrl
     }
 
 
-    function resultFetched(
+    public function resultFetched(
         \Exception $e = null,
         Response $response = null,
         UrlToCheck $urlToCheck,
