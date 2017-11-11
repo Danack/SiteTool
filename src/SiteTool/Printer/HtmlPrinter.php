@@ -2,25 +2,24 @@
 
 namespace SiteTool\Printer;
 
-class HTMLPrinter {
-
+class HTMLPrinter
+{
     /**
      * @var URLResult[]
      */
-    private $results; 
+    private $results;
     
-    function __construct(array $results, $baseURL) {
+    public function __construct(array $results, $baseURL)
+    {
         $this->results = $results;
         $this->baseURL = $baseURL;
     }
 
-    function output($outputStream) {
-
+    public function output($outputStream)
+    {
         fwrite($outputStream, "<html>");
         fwrite($outputStream, "<body>");
-
         fwrite($outputStream, "<table>");
-
         fwrite($outputStream, "<thead>");
         fwrite($outputStream, "<tr>");
         fwrite($outputStream, "<th>Status</th>");

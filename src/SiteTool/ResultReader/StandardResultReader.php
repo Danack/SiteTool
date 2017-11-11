@@ -24,7 +24,7 @@ class StandardResultReader implements ResultReader
     public function readAll()
     {
         $results = [];
-        while(($line = fgets($this->fileHandle)) !== false) {
+        while (($line = fgets($this->fileHandle)) !== false) {
             $parts = explode(',', $line);
             $results[] = new Result(
                 trim($parts[0]),
@@ -36,5 +36,4 @@ class StandardResultReader implements ResultReader
 
         return $results;
     }
-    
 }
