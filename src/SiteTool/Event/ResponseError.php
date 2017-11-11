@@ -1,12 +1,12 @@
 <?php
 
 
-namespace SiteTool\Processor\Data;
+namespace SiteTool\Event;
 
 use Amp\Artax\Response;
 use SiteTool\UrlToCheck;
 
-class ResponseReceived
+class ResponseError
 {
     public $response;
     public $urlToCheck;

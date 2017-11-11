@@ -1,11 +1,11 @@
 <?php
 
 
-namespace SiteTool\Processor;
+namespace SiteTool\EventProcessor;
 
 use SiteTool\Writer\OutputWriter;
 use SiteTool\EventManager;
-use SiteTool\Processor\Data\FoundUrlToSkip;
+use SiteTool\Event\FoundUrlToSkip;
 
 
 class LogSkippedLink

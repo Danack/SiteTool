@@ -1,11 +1,11 @@
 <?php
 
-namespace SiteTool\Processor;
+namespace SiteTool\EventProcessor;
 
 use SiteTool\UrlToCheck;
-use SiteTool\Processor\Data\FoundUrl;
+use SiteTool\Event\FoundUrl;
 use SiteTool\EventManager;
-use SiteTool\Processor\Data\HtmlToParse;
+use SiteTool\Event\HtmlToParse;
 use Amp\Artax\SocketException;
 use FluentDOM\Document;
 use FluentDOM\Element;

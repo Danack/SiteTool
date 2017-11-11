@@ -4,5 +4,5 @@ namespace SiteTool;
 
 interface Writer
 {
-   public function write($string, ...$otherStrings);
+    public function write($string, ...$otherStrings);
 }

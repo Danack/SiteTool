@@ -1,6 +1,6 @@
 <?php
 
-namespace SiteTool\Processor\Data;
+namespace SiteTool\Event;
 
 use SiteTool\UrlToCheck;
 use Amp\Artax\Response;

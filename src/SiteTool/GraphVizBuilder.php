@@ -79,7 +79,7 @@ class GraphVizBuilder
             [
                 'center' => true,
                 'fontsize' => 28,
-                'label' => 'Switches are circles. Events are boxes.',
+                'label' => 'Boxes are events, circles are event processors.',
                 'margin' => "0.5,0.5",
                 'mindist' => 1.0,
                 'packMode' => 'node',

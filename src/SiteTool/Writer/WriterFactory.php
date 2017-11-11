@@ -6,7 +6,7 @@ class WriterFactory
 {
     private $fileWritersByPath = [];
     
-    function createFileWriter($filename)
+    public function createFileWriter($filename)
     {
         if (array_key_exists($filename, $this->fileWritersByPath) === true) {
             return $this->fileWritersByPath[$filename];
@@ -17,7 +17,7 @@ class WriterFactory
         return $fileWriter;
     }
     
-    function create($outputTypeOrFilename)
+    public function create($outputTypeOrFilename)
     {
         switch ($outputTypeOrFilename) {
             case null:

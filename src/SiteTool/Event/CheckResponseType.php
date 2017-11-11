@@ -1,7 +1,7 @@
 <?php
 
 
-namespace SiteTool\Processor\Data;
+namespace SiteTool\Event;
 
 use Amp\Artax\Response;
 use SiteTool\UrlToCheck;

@@ -6,15 +6,15 @@ use Auryn\Injector;
 use SiteTool\CrawlerConfig;
 use SiteTool\UrlToCheck;
 use SiteTool\Writer\OutputWriter;
-use SiteTool\Processor\CheckContentTypeIsHtml;
-use SiteTool\Processor\FetchUrl;
-use SiteTool\Processor\ParseHtmlToFindLinks;
-use SiteTool\Processor\CheckResponseIsOk;
-use SiteTool\Processor\ShouldUrlFoundBeFollowed;
-use SiteTool\Processor\LogResponseIsOk;
-use SiteTool\Processor\LogSkippedLink;
+use SiteTool\EventProcessor\CheckContentTypeIsHtml;
+use SiteTool\EventProcessor\FetchUrl;
+use SiteTool\EventProcessor\ParseHtmlToFindLinks;
+use SiteTool\EventProcessor\CheckResponseIsOk;
+use SiteTool\EventProcessor\ShouldUrlFoundBeFollowed;
+use SiteTool\EventProcessor\LogResponseIsOk;
+use SiteTool\EventProcessor\LogSkippedLink;
 use SiteTool\GraphVizBuilder;
-use SiteTool\Processor\Data\FoundUrlToFollow;
+use SiteTool\Event\FoundUrlToFollow;
 use Zend\EventManager\EventManager;
 
 
@@ -25,7 +25,7 @@ class Debug
     public function __construct(Injector $injector)
     {
         $processorsToCreate = [
-            \SiteTool\Processor\ValidateHtmlToParse::class,
+            \SiteTool\EventProcessor\ValidateHtmlToParse::class,
         ];
 
         foreach ($processorsToCreate as $relayToCreate) {

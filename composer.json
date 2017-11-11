@@ -33,8 +33,8 @@
         "phpunit/phpunit": "3.7.*",
         "room11/caching": "^0.0.4", 
         "room11/http": "^0.2.0",
-        "squizlabs/php_codesniffer": "^2.0.0"
-        
+        "squizlabs/php_codesniffer": "^2.8",
+        "yoast/yoastcs": "0.4.2"
     },
     "require":{
         "php": "^5.4 | ^7",

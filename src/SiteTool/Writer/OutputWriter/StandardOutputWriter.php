@@ -28,7 +28,7 @@ class StandardOutputWriter implements OutputWriter
         
         $knownWriters = [
             OutputWriter::PROGRESS,
-            OutputWriter::CRAWL_RESULT, 
+            OutputWriter::CRAWL_RESULT,
             OutputWriter::ERROR,
             OutputWriter::MIGRATION_RESULT,
             OutputWriter::CHECK_RESULT

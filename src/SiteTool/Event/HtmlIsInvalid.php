@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SiteTool\Processor\Data;
+namespace SiteTool\Event;
 
 use SiteTool\UrlToCheck;
 

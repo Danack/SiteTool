@@ -50,7 +50,7 @@ class MigrateCheck
      */
     public function run(Injector $injector)
     {
-        $plugins[] = $injector->make(\SiteTool\Processor\MigrateCheckOkStatus::class);
+        $plugins[] = $injector->make(\SiteTool\EventProcessor\MigrateCheckOkStatus::class);
         \Amp\run([$this, 'check']);
     }
 

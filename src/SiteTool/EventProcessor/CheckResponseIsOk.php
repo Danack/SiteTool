@@ -1,12 +1,12 @@
 <?php
 
-namespace SiteTool\Processor;
+namespace SiteTool\EventProcessor;
 
 use Amp\Artax\Response;
 use SiteTool\UrlToCheck;
 use SiteTool\EventManager;
-use SiteTool\Processor\Data\ResponseReceived;
-use SiteTool\Processor\Data\ResponseOk;
+use SiteTool\Event\ResponseReceived;
+use SiteTool\Event\ResponseOk;
 use SiteTool\Writer\OutputWriter;
 
 class CheckResponseIsOk

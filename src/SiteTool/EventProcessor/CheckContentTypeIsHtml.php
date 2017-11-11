@@ -1,11 +1,11 @@
 <?php
 
-namespace SiteTool\Processor;
+namespace SiteTool\EventProcessor;
 
 use SiteTool\EventManager;
-use SiteTool\Processor\Data\CheckResponseType;
-use SiteTool\Processor\Data\HtmlToParse;
-use SiteTool\Processor\Data\ResponseOk;
+use SiteTool\Event\CheckResponseType;
+use SiteTool\Event\HtmlToParse;
+use SiteTool\Event\ResponseOk;
 
 
 class CheckContentTypeIsHtml 

@@ -1,11 +1,11 @@
 <?php
 
-namespace SiteTool\Processor;
+namespace SiteTool\EventProcessor;
 
 use SiteTool\UrlToCheck;
 use SiteTool\EventManager;
 use SiteTool\Writer\OutputWriter;
-use SiteTool\Processor\Data\HtmlIsInvalid;
+use SiteTool\Event\HtmlIsInvalid;
 
 class LogHtmlIsInvalid
 {

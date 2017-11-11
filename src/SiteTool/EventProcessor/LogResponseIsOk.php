@@ -1,11 +1,11 @@
 <?php
 
 
-namespace SiteTool\Processor;
+namespace SiteTool\EventProcessor;
 
 use SiteTool\EventManager;
 use SiteTool\Writer\OutputWriter;
-use SiteTool\Processor\Data\ResponseReceived;
+use SiteTool\Event\ResponseReceived;
 
 class LogResponseIsOk
 {

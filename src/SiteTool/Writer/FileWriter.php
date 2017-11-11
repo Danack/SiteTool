@@ -25,7 +25,7 @@ class FileWriter implements Writer
 
     private function init()
     {
-        resolve(function() {
+        resolve(function () {
             if ($this->fileHandle) {
                 return;
             }
@@ -39,7 +39,7 @@ class FileWriter implements Writer
 
     public function __destruct()
     {
-        resolve(function() {
+        resolve(function () {
             if ($this->fileHandle) {
                 yield $this->fileHandle->close();
             }
@@ -57,7 +57,7 @@ class FileWriter implements Writer
         $line .= implode(", ", $otherStrings);
         $line .= "\n";
 
-        resolve(function() use ($line) {
+        resolve(function () use ($line) {
             yield $this->fileHandle->write($line);
         });
     }

@@ -1,16 +1,16 @@
 <?php
 
 
-namespace SiteTool\Processor;
+namespace SiteTool\EventProcessor;
 
 use SiteTool\UrlToCheck;
 use SiteTool\EventManager;
-use SiteTool\Processor\Data\FoundUrl;
+use SiteTool\Event\FoundUrl;
 use SiteTool\CrawlerConfig;
 use SiteTool\Writer\OutputWriter;
 use Amp\Artax\Uri;
-use SiteTool\Processor\Data\FoundUrlToFollow;
-use SiteTool\Processor\Data\FoundUrlToSkip;
+use SiteTool\Event\FoundUrlToFollow;
+use SiteTool\Event\FoundUrlToSkip;
 
 class ShouldUrlFoundBeFollowed
 {

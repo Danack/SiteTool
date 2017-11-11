@@ -6,7 +6,7 @@ use AurynConfig\InjectionParams;
 // These classes will only be created  by the injector once
 $shares = [
     SiteTool\SiteChecker::class,
-    SiteTool\Processor\Rules::class,
+    SiteTool\EventProcessor\Rules::class,
 
     SiteTool\CrawlerConfig::class,
     SiteTool\Writer\FileWriter::class,

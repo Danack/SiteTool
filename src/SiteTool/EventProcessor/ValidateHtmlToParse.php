@@ -1,14 +1,14 @@
 <?php
 
-namespace SiteTool\Processor;
+namespace SiteTool\EventProcessor;
 
 use SiteTool\UrlToCheck;
 use SiteTool\EventManager;
 use Amp\Artax\Client as ArtaxClient;
 use SiteTool\Writer\OutputWriter;
-use SiteTool\Processor\Data\HtmlIsValid;
-use SiteTool\Processor\Data\HtmlIsInvalid;
-use SiteTool\Processor\Data\HtmlToParse;
+use SiteTool\Event\HtmlIsValid;
+use SiteTool\Event\HtmlIsInvalid;
+use SiteTool\Event\HtmlToParse;
 
 class ValidateHtmlToParse
 {

@@ -2,7 +2,7 @@
 
 namespace SiteToolTest;
 
-use SiteTool\Processor\Rules;
+use SiteTool\EventProcessor\Rules;
 use SiteTool\ErrorWriter\NullErrorWriter;
 use SiteTool\StatusWriter\NullStatusWriter;
 use SiteTool\ErrorWriter\EchoErrorWriter;

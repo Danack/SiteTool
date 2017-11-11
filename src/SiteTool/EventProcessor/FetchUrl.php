@@ -1,13 +1,13 @@
 <?php
 
-namespace SiteTool\Processor;
+namespace SiteTool\EventProcessor;
 
 use SiteTool\UrlToCheck;
 use Amp\Artax\Response;
 use SiteTool\EventManager;
-use SiteTool\Processor\Data\ResponseReceived;
-use SiteTool\Processor\Data\FoundUrlToFollow;
-use SiteTool\Processor\Data\ResponseError;
+use SiteTool\Event\ResponseReceived;
+use SiteTool\Event\FoundUrlToFollow;
+use SiteTool\Event\ResponseError;
 use Amp\Artax\Client as ArtaxClient;
 use SiteTool\Writer\OutputWriter;
 

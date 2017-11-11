@@ -43,7 +43,7 @@ class Check
      */
     public function run(Injector $injector)
     {
-        $plugins[] = $injector->make(\SiteTool\Processor\SiteCheckOkStatus::class);
+        $plugins[] = $injector->make(\SiteTool\EventProcessor\SiteCheckOkStatus::class);
         \Amp\run([$this, 'check']);
     }
 

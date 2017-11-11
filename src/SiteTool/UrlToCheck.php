@@ -7,10 +7,10 @@ class UrlToCheck
     private $url;
     private $referrer;
     
-    function __construct($url, $referrer)
+    public function __construct($url, $referrer)
     {
         $this->url = $url;
-        $this->referrer = $referrer;   
+        $this->referrer = $referrer;
     }
 
     /**
