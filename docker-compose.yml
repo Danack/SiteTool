@@ -1,0 +1,19 @@
+version: "3"
+services:
+  php:
+    build: docker/sitetool_php
+   # image: php:latest
+#    depends_on:
+ #     - redis
+    volumes:
+      - .:/var/app
+  #    - ./config/localdev:/etc/config
+    #ports:
+    #  - "9001:9000"
+#  redis:
+#    image: redis:3.2
+#    ports:
+#      - "6379:6379"
+#    volumes:
+#      - ./config/localdev:/usr/local/etc
+#    command: ["redis-server", "/usr/local/etc/redis.conf"]
