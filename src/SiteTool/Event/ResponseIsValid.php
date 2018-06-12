@@ -8,26 +8,26 @@ use Amp\Artax\Response;
 use SiteTool\UrlToCheck;
 use SiteTool\Event\ResponseReceived;
 
-class ResponseOk
+class ResponseIsValid
 {
-    /** @var ResponseReceived */
-    public $responseReceived;
+    /** @var array */
+    public $data;
 
     /** @var UrlToCheck */
     public $urlToCheck;
     
-    public function __construct(ResponseReceived $responseReceived, UrlToCheck $urlToCheck)
+    public function __construct(array $data, UrlToCheck $urlToCheck)
     {
-        $this->responseReceived = $responseReceived;
+        $this->data = $data;
         $this->urlToCheck = $urlToCheck;
     }
 
     /**
-     * @return \SiteTool\Event\ResponseReceived
+     * @return array
      */
-    public function getResponseReceived(): \SiteTool\Event\ResponseReceived
+    public function getData(): array
     {
-        return $this->responseReceived;
+        return $this->data;
     }
 
     /**

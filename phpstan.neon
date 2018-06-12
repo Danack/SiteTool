@@ -1,0 +1,7 @@
+parameters:
+  bootstrap: null
+  autoload_files:
+    - src/factories.php
+    - src/functions.php
+  excludes_analyse:
+    - *lib/birke/*

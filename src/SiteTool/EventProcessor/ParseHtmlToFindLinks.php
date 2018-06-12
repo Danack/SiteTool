@@ -23,19 +23,13 @@ class ParseHtmlToFindLinks implements Relay
     /** @var \SiteTool\Writer\OutputWriter  */
     private $outputWriter;
     
-    public function __construct(
-        EventManager $eventManager,
-        OutputWriter $outputWriter
-    ) {
+    public function __construct(EventManager $eventManager, OutputWriter $outputWriter)
+    {
         $this->outputWriter = $outputWriter;
         $eventManager->attachEvent(HtmlToParse::class, [$this, 'parseResponse'], $this->switchName);
         $this->foundUrlEventTrigger = $eventManager->createTrigger(FoundUrl::class, $this->switchName);
     }
 
-    /**
-     * @param URLToCheck $urlToCheck
-     * @param $body
-     */
     public function parseResponse(HtmlToParse $htmlToParse)
     {
         $urlToCheck = $htmlToParse->getUrlToCheck();

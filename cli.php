@@ -12,10 +12,10 @@ require_once(__DIR__.'/./vendor/autoload.php');
 CLIFunction::setupErrorHandlers();
 
 $injector = new Injector();
-$standardInjectionParams = require __DIR__."/./src/injectionParams.php";
-
-/** @var $injectionParams \AurynConfig\InjectionParams */
-$standardInjectionParams->addToInjector($injector);
+//$standardInjectionParams = require __DIR__."/./src/injectionParams.php";
+//
+///** @var $injectionParams \AurynConfig\InjectionParams */
+//$standardInjectionParams->addToInjector($injector);
 $cliInjectionParams = require __DIR__."/src/cliInjectionParams.php";
 
 /** @var $cliInjectionParams \AurynConfig\InjectionParams */
@@ -38,6 +38,10 @@ $tierApp->addExecutable(TIER_ROUTING, 'Tier\Bridge\ConsoleRouter::routeCommand')
 try {
     $tierApp->execute();
 }
+catch (\SiteTool\SiteToolException $ste) {
+    echo $ste->getMessage();
+    exit(-1);
+}
 catch (\Exception $e) {
     echo $e->getMessage() . "\n";
     echo $e->getTraceAsString();
@@ -48,4 +52,5 @@ catch (\Exception $e) {
         echo $e->getTraceAsString();
         echo "\n";
     }
+    exit(-1);
 }

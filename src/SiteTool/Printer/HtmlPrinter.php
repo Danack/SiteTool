@@ -2,14 +2,19 @@
 
 namespace SiteTool\Printer;
 
+use SiteTool\Result;
+
 class HTMLPrinter
 {
     /**
-     * @var URLResult[]
+     * @var Result[]
      */
     private $results;
+
+    /** @var string */
+    private $baseURL;
     
-    public function __construct(array $results, $baseURL)
+    public function __construct(array $results, string $baseURL)
     {
         $this->results = $results;
         $this->baseURL = $baseURL;

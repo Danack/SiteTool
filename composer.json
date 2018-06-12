@@ -20,7 +20,10 @@
         "psr-0": {
             "SiteTool": "src/"
         },
-        "files": ["src/functions.php"]
+        "files": [
+          "src/functions.php",
+          "src/factories.php"
+        ]
     },
     "autoload-dev": {
         "psr-0": {

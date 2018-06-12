@@ -75,3 +75,5 @@ DecideFoundUrlShouldBeFollowed
 
 Where it makes sense, use the event name that is being listened for, in the procesor name. 
 
+
+php phpstan.phar analyze -c ./phpstan.neon -l 7 src

@@ -75,7 +75,7 @@ class ShouldUrlFoundBeFollowed implements Relay
 
         if (strcasecmp($newUri->getHost(), $this->crawlerConfig->domainName) !== 0) {
             $this->skippingLink($href, $newUri->getHost());
-            return;
+            return null;
         }
 
         $urlToCheck = new UrlToCheck($newUri->__toString(), $foundUrlEventData->urlToCheck->getUrl());

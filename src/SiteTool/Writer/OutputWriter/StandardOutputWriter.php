@@ -8,7 +8,7 @@ use SiteTool\Writer\WriterFactory;
 
 class StandardOutputWriter implements OutputWriter
 {
-    /** @var \SiteTool\Writer[] */
+    /** @var \SiteTool\Writer[]|null[] */
     private $writers = [];
 
     public function __construct(

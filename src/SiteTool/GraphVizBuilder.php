@@ -122,7 +122,5 @@ class GraphVizBuilder
         foreach ($commmands as $commmand) {
             exec("/usr/bin/$commmand -Tpng -ograph_output_$commmand.png graph.dot");
         }
-        
-        //   exec("/usr/bin/circo -Tpng -ograph_output_circo.png graph.dot");
     }
 }

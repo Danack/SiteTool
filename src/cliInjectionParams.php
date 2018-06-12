@@ -9,7 +9,6 @@ $shares = [
     SiteTool\Writer\NullWriter::class,
     SiteTool\Writer\StderrWriter::class,
     SiteTool\Writer\StdoutWriter::class,
-
     SiteTool\CrawlerConfig::class,
     SiteTool\ResultReader\StandardResultReader::class,
     SiteTool\GraphVizBuilder::class,
@@ -29,6 +28,8 @@ $aliases = [
 $delegates = [
     SiteTool\CrawlerConfig::class => 'createCrawlerConfig',
     SiteTool\ResultReader\StandardResultReader::class => 'createStandardResultReader',
+    SiteTool\ProcessSourceList::class => 'createProcessSourceList',
+    Amp\Artax\Client::class => 'createArtaxClient',
 ];
 
 // If necessary, define some params per class.
@@ -41,7 +42,6 @@ $defines = [
     'maxCount' => 50000,
     'jobs' => 4,
     'initialUrl' => 'http://phpimagick.com',
-    
 ];
 
 $prepares = [

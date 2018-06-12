@@ -9,7 +9,7 @@ use SiteTool\UrlToCheck;
 
 class ResponseReceived
 {
-    /** @var response  */
+    /** @var Response  */
     private $response;
 
     /** @var string  */

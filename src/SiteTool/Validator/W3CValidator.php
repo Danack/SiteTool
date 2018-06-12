@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SiteTool;
+namespace SiteTool\Validator;
 
 use \Exception;
 use \SimpleXMLElement;

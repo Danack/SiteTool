@@ -20,7 +20,6 @@ class FetchUrl implements Relay
     
     private $switchName = "Fetch the URL";
     
-    /** @var URLToCheck[] */
     private $urlsToCheck = [];
     
     private $count = 0;
@@ -91,9 +90,6 @@ class FetchUrl implements Relay
         }
     }
 
-    /**
-     * @param URLToCheck $urlToCheck
-     */
     public function followURL(FoundUrlToFetch $foundUrlToFollow)
     {
         $urlToCheck = $foundUrlToFollow->urlToCheck;

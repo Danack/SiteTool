@@ -1,6 +1,6 @@
 <?php
 
-use Amp\Artax\DefaultClient as ArtaxClient;
+
 use Auryn\Injector;
 use Danack\Console\Application;
 use Danack\Console\Command\Command;
@@ -13,20 +13,6 @@ function getRawCharacters($result)
     $resultInHex = $resultInHex[1];
     $resultSeparated = implode(', ', str_split($resultInHex, 2)); //byte safe
     return $resultSeparated;
-}
-
-/**
- * @param $jobs
- * @return ArtaxClient
- * @throws Error
- */
-function createArtaxClient($jobs)
-{
-    $client = new ArtaxClient();
-    //$client->setOption(\Amp\Artax\Client::OP_MS_CONNECT_TIMEOUT, 2500);
-    //$client->setOption(ArtaxClient::OP_HOST_CONNECTION_LIMIT, $jobs);
-
-    return $client;
 }
 
 function addOutputOptionsToCommand(Command $command)
@@ -199,15 +185,32 @@ function createApplication()
 //        $message,
 //        'migration_result.txt'
 //    );
-//    
+//
 //    addOutputOptionsToCommand($migrateCheckCommand, false);
 //    $application->add($migrateCheckCommand);
 
 
 
-    $crawlerCommand = new Command('site:go', 'SiteTool\Command\GoGoGo::run');
-    $crawlerCommand->setDescription("GoGoGo");
-    $application->add($crawlerCommand);
+    $goCommand = new Command('site:go', 'SiteTool\Command\RunTheThings::run');
+    $goCommand->setDescription("GoGoGo");
+
+    $goCommand->addArgument(
+        'processSource',
+        InputArgument::REQUIRED,
+        'The class name that contains the list of items to process'
+    );
+    $application->add($goCommand);
+
+    /////////////////////
+
+    $graphCommand = new Command('site:graph', '\SiteTool\Command\GraphTheThings::run');
+    $graphCommand->setDescription("GraphTheThings");
+    $graphCommand->addArgument(
+        'processSource',
+        InputArgument::REQUIRED,
+        'The class name that contains the list of items to process'
+    );
+    $application->add($graphCommand);
 
     return $application;
 }
@@ -258,4 +261,33 @@ function createCrawlerConfig($initialUrl)
         $domainName,
         $initialPath
     );
+}
+
+
+
+
+function ampRunAllTheThings($workers, $setupCallable)
+{
+    $coroutines = [];
+
+    foreach ($workers as $worker) {
+        $coroutines[] = \Amp\coroutine($worker);
+    }
+
+    \Amp\Loop::run(function () use ($coroutines, $setupCallable) {
+        $setupCallable();
+        $runningThings = [];
+
+        foreach ($coroutines as $coroutine) {
+            $runningThings[] = $coroutine();
+        }
+
+        yield $runningThings;
+
+        // Because we automatically exit the event loop, this line will never be reached.
+        // If some end condition is known, the while (true) in the workers can be replaced
+        // and then this line will be reached once finished.
+        print "Finished processing." . PHP_EOL; // <-- Never reached
+    });
+
 }

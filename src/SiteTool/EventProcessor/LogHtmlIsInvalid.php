@@ -22,9 +22,6 @@ class LogHtmlIsInvalid implements Relay
         $eventManager->attachEvent(HtmlIsInvalid::class, [$this, 'processResult'], $this->switchName);
     }
 
-    /**
-     * @param URLToCheck $urlToCheck
-     */
     public function processResult(HtmlIsInvalid $foundUrlToFollow)
     {
         printf("Validation errors for url %s \n", $foundUrlToFollow->getUrlToCheck()->getUrl());

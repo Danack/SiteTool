@@ -41,12 +41,9 @@ class ValidateHtmlToParse implements Relay
         $this->htmlIsInvalidTrigger = $eventManager->createTrigger(HtmlIsInvalid::class, $this->switchName);
     }
 
-    /**
-     * @param URLToCheck $urlToCheck
-     */
     public function validateHtml(HtmlToParse $htmlToParse)
     {
-        $html = $htmlToParse->response->getBody();
+        $html = $htmlToParse->getResponseBody();
 
         $tmpfname = tempnam("./var/tmp", "tidycheck_");
         file_put_contents($tmpfname, $html);
@@ -56,10 +53,10 @@ class ValidateHtmlToParse implements Relay
         unlink($tmpfname);
 
         if ($return_var !== 0) {
-            ($this->htmlIsInvalidTrigger)(new HtmlIsInvalid($htmlToParse->urlToCheck, $output));
+            ($this->htmlIsInvalidTrigger)(new HtmlIsInvalid($htmlToParse->getUrlToCheck(), $output));
         }
         else {
-            ($this->htmlIsValidTrigger)(new HtmlIsValid($htmlToParse->urlToCheck));
+            ($this->htmlIsValidTrigger)(new HtmlIsValid($htmlToParse->getUrlToCheck()));
         }
     }
 

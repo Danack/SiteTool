@@ -7,6 +7,7 @@ Bash into the box:
 docker exec -it sitetool_php_1 bash
 
 Generate a graph:
-docker exec sitetool_php_1 php cli.php site:crawl http://phpimagick.com/ --graph
+
+docker exec sitetool_php_1 php cli.php php cli.php site:graph "SiteTool\CrawlerProcessSourceList"
 
 ctrl^C this window to stop the docker box.

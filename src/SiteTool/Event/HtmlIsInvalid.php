@@ -14,12 +14,6 @@ class HtmlIsInvalid
     /** @var array  */
     private $htmlErrors;
 
-    /**
-     * HtmlValidationResult constructor.
-     * @param \SiteTool\W3CValidator $validator
-     * @param \SiteTool\UrlToCheck $urlToCheck
-     * @param string $fullURL
-     */
     public function __construct(UrlToCheck $urlToCheck, array $htmlErrors)
     {
         $this->urlToCheck = $urlToCheck;

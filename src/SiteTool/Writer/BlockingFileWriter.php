@@ -7,16 +7,16 @@ use SiteTool\Writer;
 
 class BlockingFileWriter implements Writer
 {
-    /** @var \resource */
+    /** @var resource|null */
     private $fileHandle = null;
     private $filename;
 
     /**
      * FileWriter constructor.
-     * @param $filename
+     * @param string $filename
      * @throws \Exception
      */
-    public function __construct($filename)
+    public function __construct(string $filename)
     {
         if (strlen($filename) == 0) {
             throw new \Exception("Filename cannot be empty.");
