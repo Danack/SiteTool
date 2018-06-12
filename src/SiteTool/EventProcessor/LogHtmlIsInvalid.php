@@ -7,7 +7,7 @@ use SiteTool\EventManager;
 use SiteTool\Writer\OutputWriter;
 use SiteTool\Event\HtmlIsInvalid;
 
-class LogHtmlIsInvalid
+class LogHtmlIsInvalid implements Relay
 {
     private $switchName = "Output validation\nis invalid result";
 
@@ -31,5 +31,10 @@ class LogHtmlIsInvalid
         foreach ($foundUrlToFollow->getHtmlErrors() as $error) {
             echo $error . "\n";
         }
+    }
+
+    public function getAsyncWorkers()
+    {
+        return [];
     }
 }

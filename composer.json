@@ -43,9 +43,8 @@
         "danack/console": "~2.6",
         "danack/tier": "^0.7.1",
         "fluentdom/fluentdom": "~5.3",
-        "amphp/artax": "~2.0",
+        "amphp/artax": "~3.0.14",
         "zendframework/zend-eventmanager": "^3.0",
-        "amphp/dns": "dev-fix/udp-recvfrom as v0.8.11",
         "alom/graphviz": "~1.1"
     }
 }

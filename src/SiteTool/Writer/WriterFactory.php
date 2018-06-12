@@ -11,7 +11,8 @@ class WriterFactory
         if (array_key_exists($filename, $this->fileWritersByPath) === true) {
             return $this->fileWritersByPath[$filename];
         }
-        $fileWriter = new \SiteTool\Writer\FileWriter($filename);
+        //$fileWriter = new \SiteTool\Writer\FileWriter($filename);
+        $fileWriter = new \SiteTool\Writer\BlockingFileWriter($filename);
         $fileWritersByPath[$filename] = $fileWriter;
         
         return $fileWriter;

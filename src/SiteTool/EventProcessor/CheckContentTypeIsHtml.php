@@ -6,7 +6,7 @@ use SiteTool\EventManager;
 use SiteTool\Event\HtmlToParse;
 use SiteTool\Event\ResponseOk;
 
-class CheckContentTypeIsHtml
+class CheckContentTypeIsHtml implements Relay
 {
     /** @var callable  */
     private $htmlReceivedTrigger;
@@ -25,16 +25,15 @@ class CheckContentTypeIsHtml
      */
     public function checkResponseType(ResponseOk $checkResponseType)
     {
-        $response = $checkResponseType->response;
+        $response = $checkResponseType->responseReceived;
         $urlToCheck = $checkResponseType->urlToCheck;
-        
-        $contentTypeHeaders = $response->getHeader('Content-Type');
+        $contentTypeHeader = $response->getResponse()->getHeader('Content-Type');
 
-        if (array_key_exists(0, $contentTypeHeaders) == false) {
+        if ($contentTypeHeader === null) {
             throw new \Exception("Content-type header not set.");
         }
 
-        $contentType = $contentTypeHeaders[0];
+        $contentType = $contentTypeHeader;
         $colonPosition = strpos($contentType, ';');
 
         if ($colonPosition !== false) {
@@ -43,8 +42,13 @@ class CheckContentTypeIsHtml
 
         if ($contentType === 'text/html') {
             $fn = $this->htmlReceivedTrigger;
-            $fn(new HtmlToParse($urlToCheck, $response));
+            $fn(new HtmlToParse($urlToCheck, $response->getResponse(), $response->getResponseBody()));
             return;
         }
+    }
+
+    public function getAsyncWorkers()
+    {
+        return [];
     }
 }

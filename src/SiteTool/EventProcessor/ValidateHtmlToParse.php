@@ -10,7 +10,7 @@ use SiteTool\Event\HtmlIsValid;
 use SiteTool\Event\HtmlIsInvalid;
 use SiteTool\Event\HtmlToParse;
 
-class ValidateHtmlToParse
+class ValidateHtmlToParse implements Relay
 {
     /** @var  callable */
     private $htmlIsValidTrigger;
@@ -61,5 +61,10 @@ class ValidateHtmlToParse
         else {
             ($this->htmlIsValidTrigger)(new HtmlIsValid($htmlToParse->urlToCheck));
         }
+    }
+
+    public function getAsyncWorkers()
+    {
+        return [];
     }
 }

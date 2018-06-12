@@ -3,15 +3,14 @@
 namespace SiteTool\EventProcessor;
 
 use SiteTool\UrlToCheck;
-use Amp\Artax\Response;
 use SiteTool\EventManager;
 use SiteTool\Event\ResponseReceived;
-use SiteTool\Event\FoundUrlToFollow;
+use SiteTool\Event\FoundUrlToFetch;
 use SiteTool\Event\ResponseError;
 use Amp\Artax\Client as ArtaxClient;
 use SiteTool\Writer\OutputWriter;
 
-class FetchUrl
+class FetchUrl implements Relay
 {
     /** @var  callable */
     private $responseReceivedTrigger;
@@ -21,7 +20,7 @@ class FetchUrl
     
     private $switchName = "Fetch the URL";
     
-            /** @var URLToCheck[] */
+    /** @var URLToCheck[] */
     private $urlsToCheck = [];
     
     private $count = 0;
@@ -36,6 +35,12 @@ class FetchUrl
 
     private $maxCount;
 
+    /** @var \Amp\Deferred */
+    private $waiting;
+
+    /** @var \SplQueue */
+    private $queue;
+
 
     public function __construct(
         EventManager $eventManager,
@@ -45,76 +50,80 @@ class FetchUrl
         $this->outputWriter = $outputWriter;
         $this->maxCount = 10000;
         $this->artaxClient = $artaxClient;
-        $eventManager->attachEvent(FoundUrlToFollow::class, [$this, 'followURL'], $this->switchName);
+        $eventManager->attachEvent(FoundUrlToFetch::class, [$this, 'followURL'], $this->switchName);
         $this->responseReceivedTrigger = $eventManager->createTrigger(ResponseReceived::class, $this->switchName);
         $this->responseErrorTrigger = $eventManager->createTrigger(ResponseError::class, $this->switchName);
+
+        $this->queue = new \SplQueue;
+        $this->waiting = new \Amp\Deferred;
+    }
+
+
+    public function doWork()
+    {
+        while (true) {
+            while ($this->queue->isEmpty()) {
+                yield $this->waiting->promise();
+            }
+            $urlToCheck = $this->queue->pop();
+            /** @var \SiteTool\UrlToCheck $urlToCheck */
+            $response = yield $this->artaxClient->request($urlToCheck->getUrl());
+            $responseBody = yield $response->getBody();
+
+            printf(
+                "# %s → %s %s (queue size: %d)" . PHP_EOL,
+                $urlToCheck->getUrl(),
+                $response->getStatus(),
+                $response->getReason(),
+                $this->queue->count()
+            );
+
+            $fn = $this->responseReceivedTrigger;
+            $fn(new ResponseReceived(
+                $response,
+                $responseBody,
+                $urlToCheck
+            ));
+
+            $deferred = $this->waiting;
+            $this->waiting = new \Amp\Deferred;
+            $deferred->resolve();
+        }
     }
 
     /**
      * @param URLToCheck $urlToCheck
      */
-    public function followURL(FoundUrlToFollow $foundUrlToFollow)
+    public function followURL(FoundUrlToFetch $foundUrlToFollow)
     {
         $urlToCheck = $foundUrlToFollow->urlToCheck;
-        $url = $urlToCheck->getUrl();
-        if (array_key_exists($url, $this->urlsToCheck) === true) {
-            return null;
+        if (array_key_exists($urlToCheck->getUrl(), $this->urlsToCheck) === true) {
+            // already scanning this URL
+            return;
+        }
+
+        if ($this->count >= $this->maxCount) {
+            // We've hit the limit for how many URLs to scan.
+            return;
         }
 
         $this->count++;
-        if ($this->count > $this->maxCount) {
-            $message = sprintf(
-                "Skipping %s as limit of %d urls has been reached.",
-                $urlToCheck->getUrl(),
-                $this->maxCount
-            );
-            $this->outputWriter->write(
-                OutputWriter::PROGRESS,
-                $message
-            );
 
-            return null;
-        }
-
-        $this->urlsToCheck[$url] = null;
-        $this->fetchURL($urlToCheck);
+        $this->urlsToCheck[$urlToCheck->getUrl()] = null;
+        $this->queue->push($urlToCheck);
     }
 
-    /**
-     * @param URLToCheck $urlToCheck
-     */
-    public function fetchURL(URLToCheck $urlToCheck)
+    public function getAsyncWorkers()
     {
-        $fullURL = $urlToCheck->getUrl();
-        echo "$fullURL \n";
-        
-        $this->outputWriter->write(
-            OutputWriter::PROGRESS,
-            "Fetching $fullURL from referrer " . $urlToCheck->getReferrer()
-        );
-        $promise = $this->artaxClient->request($fullURL);
-
-        $analyzeResult = function (
-            \Exception $e = null,
-            Response $response = null
-        ) use ($urlToCheck, $fullURL) {
-            $this->resultFetched($e, $response, $urlToCheck, $fullURL);
-        };
-
-        $promise->when($analyzeResult);
-    }
-
-
-    public function resultFetched(
-        \Exception $e = null,
-        Response $response = null,
-        UrlToCheck $urlToCheck,
-        $fullURL
-    ) {
-        if ($response !== null) {
-            $fn = $this->responseReceivedTrigger;
-            $fn(new ResponseReceived($response, $urlToCheck));
-            return;
-        }
+        return [
+            [$this, 'doWork'],
+            [$this, 'doWork'],
+            [$this, 'doWork'],
+            [$this, 'doWork'],
+            [$this, 'doWork'],
+            [$this, 'doWork'],
+            [$this, 'doWork'],
+            [$this, 'doWork'],
+        ];
     }
 }

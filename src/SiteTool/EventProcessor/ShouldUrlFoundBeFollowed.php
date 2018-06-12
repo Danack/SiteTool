@@ -8,11 +8,12 @@ use SiteTool\EventManager;
 use SiteTool\Event\FoundUrl;
 use SiteTool\CrawlerConfig;
 use SiteTool\Writer\OutputWriter;
-use Amp\Artax\Uri;
-use SiteTool\Event\FoundUrlToFollow;
+use Amp\Uri\Uri;
+
+use SiteTool\Event\FoundUrlToFetch;
 use SiteTool\Event\FoundUrlToSkip;
 
-class ShouldUrlFoundBeFollowed
+class ShouldUrlFoundBeFollowed implements Relay
 {
     /** @var  callable */
     private $skippingLinkTrigger;
@@ -21,7 +22,13 @@ class ShouldUrlFoundBeFollowed
     private $foundUrlToFollowTrigger;
 
     private $switchName = "Should we follow this URL?";
-    
+
+    /** @var OutputWriter */
+    private $outputWriter;
+
+    /** @var CrawlerConfig */
+    private $crawlerConfig;
+
     public function __construct(
         EventManager $eventManager,
         CrawlerConfig $crawlerConfig,
@@ -32,7 +39,7 @@ class ShouldUrlFoundBeFollowed
 
         $eventManager->attachEvent(FoundUrl::class, [$this, 'getUrlToCheck'], $this->switchName);
         $this->skippingLinkTrigger =  $eventManager->createTrigger(FoundUrlToSkip::class, $this->switchName);
-        $this->foundUrlToFollowTrigger =  $eventManager->createTrigger(FoundUrlToFollow::class, $this->switchName);
+        $this->foundUrlToFollowTrigger =  $eventManager->createTrigger(FoundUrlToFetch::class, $this->switchName);
     }
 
        /**
@@ -84,6 +91,11 @@ class ShouldUrlFoundBeFollowed
     public function foundUrlToFollow(UrlToCheck $urlToCheck)
     {
         $fn = $this->foundUrlToFollowTrigger;
-        $fn(new FoundUrlToFollow($urlToCheck));
+        $fn(new FoundUrlToFetch($urlToCheck));
+    }
+
+    public function getAsyncWorkers()
+    {
+        return [];
     }
 }

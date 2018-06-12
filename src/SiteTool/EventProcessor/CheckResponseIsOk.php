@@ -9,7 +9,7 @@ use SiteTool\Event\ResponseReceived;
 use SiteTool\Event\ResponseOk;
 use SiteTool\Writer\OutputWriter;
 
-class CheckResponseIsOk
+class CheckResponseIsOk implements Relay
 {
     /** @var  \callable */
     private $responseOkTrigger;
@@ -28,20 +28,11 @@ class CheckResponseIsOk
         $this->responseOkTrigger = $eventManager->createTrigger(ResponseOk::class, $this->switchName);
     }
 
-    /**
-     * @param \Exception $e
-     * @param Response $response
-     * @param UrlToCheck $urlToCheck
-     * @param $fullURL
-     * @return null|void
-     * @throws \Exception
-     */
-    public function analyzeResult(ResponseReceived $responseReceivedData)
-    {
-        $response = $responseReceivedData->response;
-        $urlToCheck = $responseReceivedData->urlToCheck;
 
-        $status = $response->getStatus();
+    public function analyzeResult(ResponseReceived $responseReceived)
+    {
+        $urlToCheck = $responseReceived->getUrlToCheck();
+        $status = $responseReceived->getResponse()->getStatus();
         $this->outputWriter->write(
             OutputWriter::CRAWL_RESULT,
             $urlToCheck->getUrl(),
@@ -66,12 +57,12 @@ class CheckResponseIsOk
             return;
         }
 
-        $this->responseOk($response, $urlToCheck);
+        $fn = $this->responseOkTrigger;
+        $fn(new ResponseOk($responseReceived, $urlToCheck));
     }
 
-    public function responseOk(Response $response, UrlToCheck $urlToCheck)
+    public function getAsyncWorkers()
     {
-        $fn = $this->responseOkTrigger;
-        $fn(new ResponseOk($response, $urlToCheck));
+        return [];
     }
 }

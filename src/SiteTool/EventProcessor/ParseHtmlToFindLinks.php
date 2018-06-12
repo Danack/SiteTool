@@ -11,7 +11,7 @@ use FluentDOM\Document;
 use FluentDOM\Element;
 use SiteTool\Writer\OutputWriter;
 
-class ParseHtmlToFindLinks
+class ParseHtmlToFindLinks implements Relay
 {
     private $errors = 0;
     
@@ -36,10 +36,10 @@ class ParseHtmlToFindLinks
      * @param URLToCheck $urlToCheck
      * @param $body
      */
-    public function parseResponse(HtmlToParse $parseHtml)
+    public function parseResponse(HtmlToParse $htmlToParse)
     {
-        $urlToCheck = $parseHtml->urlToCheck;
-        $body = $parseHtml->response->getBody();
+        $urlToCheck = $htmlToParse->getUrlToCheck();
+        $body = $htmlToParse->getResponseBody();
         
         $ok = false;
         $path = $urlToCheck->getUrl();
@@ -58,16 +58,16 @@ class ParseHtmlToFindLinks
             $document->find('//a')->each($linkClosure);
             $ok = true;
         }
-        catch (SocketException $se) {
-            $message = "Artax\\SocketException on $path - ".$se->getMessage(). " Exception type is ".get_class($se);
-            $this->outputWriter->write(
-                \SiteTool\Writer\OutputWriter::CRAWL_RESULT,
-                $path,
-                500,
-                $urlToCheck->getReferrer(),
-                $message
-            );
-        }
+//        catch (SocketException $se) {
+//            $message = "Artax\\SocketException on $path - ".$se->getMessage(). " Exception type is ".get_class($se);
+//            $this->outputWriter->write(
+//                \SiteTool\Writer\OutputWriter::CRAWL_RESULT,
+//                $path,
+//                500,
+//                $urlToCheck->getReferrer(),
+//                $message
+//            );
+//        }
         catch (\InvalidArgumentException $iae) {
             $message = "Fluent dom exception on $path - ".$iae->getMessage(). " Exception type is ".get_class($iae);
             $this->outputWriter->write(
@@ -82,5 +82,10 @@ class ParseHtmlToFindLinks
         if ($ok != true) {
             $this->errors++;
         }
+    }
+
+    public function getAsyncWorkers()
+    {
+        return [];
     }
 }

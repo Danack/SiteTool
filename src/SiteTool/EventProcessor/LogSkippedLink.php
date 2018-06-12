@@ -7,7 +7,7 @@ use SiteTool\Writer\OutputWriter;
 use SiteTool\EventManager;
 use SiteTool\Event\FoundUrlToSkip;
 
-class LogSkippedLink
+class LogSkippedLink implements Relay
 {
     private $skippedHrefs = [];
     
@@ -33,5 +33,10 @@ class LogSkippedLink
             \SiteTool\Writer\OutputWriter::PROGRESS,
             "skipping" . $foundUrlToSkip->href
         );
+    }
+
+    public function getAsyncWorkers()
+    {
+        return [];
     }
 }

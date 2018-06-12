@@ -7,8 +7,14 @@ use SiteTool\EventManager;
 use SiteTool\Writer\OutputWriter;
 use SiteTool\Event\ResponseReceived;
 
-class LogResponseIsOk
+class LogResponseIsOk implements Relay
 {
+    /** @var OutputWriter */
+    private $outputWriter;
+
+    /** @var EventManager */
+    private $eventManager;
+
     public function __construct(
         EventManager $eventManager,
         OutputWriter $outputWriter
@@ -20,8 +26,8 @@ class LogResponseIsOk
 
     public function checkStatus(ResponseReceived $responseReceivedData)
     {
-        $response = $responseReceivedData->response;
-        $fullURL = $responseReceivedData->urlToCheck->getUrl();
+        $response = $responseReceivedData->getResponse();
+        $fullURL = $responseReceivedData->getUrlToCheck()->getUrl();
         
         $status = $response->getStatus();
         if ($status === 200) {
@@ -36,5 +42,10 @@ class LogResponseIsOk
             OutputWriter::PROGRESS | OutputWriter::CHECK_RESULT,
             $status, $fullURL
         );
+    }
+
+    public function getAsyncWorkers()
+    {
+        return [];
     }
 }

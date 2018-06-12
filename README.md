@@ -10,7 +10,7 @@ A couple of very simple tools for checking sites and site migration.
 Crawls a site to find all links, and then fetches them. Run with:
 
 ```
-php src/cli.php site:crawl http://phpimagick.com/
+php cli.php site:crawl http://phpimagick.com/
 ```
 
 Reults by default will be written to 'crawl_result.txt'.
@@ -25,7 +25,6 @@ php -d memory_limit=1280M src/cli.php site:migratecheck phpimagick.com www.phpim
 ```
 
 This allows you to check that migrating to a new platform hasn't lost any paths.
-
 
 
 ## Visualizing events
@@ -44,4 +43,35 @@ docker exec sitetool_php_1 php cli.php site:crawl http://phpimagick.com/ --graph
 ```
 
 If the project is not checked out to a directory named 'sitetool' you may need to run `docker ps` to find the exact docker image name.
+
+
+## Naming things
+
+### Event names
+
+Event names should be a past tense phrase that described what has happened. Examples: 
+
+FoundUrl
+FoundUrlToFetch
+FoundUrlToSkip       
+ReceivedHtml
+ResponseWasOk
+ResponseWasError
+ResponseWasReceived     
+
+
+## Processor names
+
+Processor names should be of the form 'verb' + 'object' or 'verb' + 'object' + 'condition'. If possible use the event name as the object.
+
+CheckResponseContentTypeIsHtml
+CheckResponseIsOk
+FetchUrl
+LogResponseWasOk
+LogResponseWasError
+LogFoundUrlToSkip
+ParseReceivedHtmlToFindUrls
+DecideFoundUrlShouldBeFollowed
+
+Where it makes sense, use the event name that is being listened for, in the procesor name. 
 

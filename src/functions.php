@@ -1,6 +1,6 @@
 <?php
 
-use Amp\Artax\Client as ArtaxClient;
+use Amp\Artax\DefaultClient as ArtaxClient;
 use Auryn\Injector;
 use Danack\Console\Application;
 use Danack\Console\Command\Command;
@@ -15,11 +15,16 @@ function getRawCharacters($result)
     return $resultSeparated;
 }
 
+/**
+ * @param $jobs
+ * @return ArtaxClient
+ * @throws Error
+ */
 function createArtaxClient($jobs)
 {
     $client = new ArtaxClient();
-    $client->setOption(\Amp\Artax\Client::OP_MS_CONNECT_TIMEOUT, 2500);
-    $client->setOption(ArtaxClient::OP_HOST_CONNECTION_LIMIT, $jobs);
+    //$client->setOption(\Amp\Artax\Client::OP_MS_CONNECT_TIMEOUT, 2500);
+    //$client->setOption(ArtaxClient::OP_HOST_CONNECTION_LIMIT, $jobs);
 
     return $client;
 }
@@ -197,6 +202,12 @@ function createApplication()
 //    
 //    addOutputOptionsToCommand($migrateCheckCommand, false);
 //    $application->add($migrateCheckCommand);
+
+
+
+    $crawlerCommand = new Command('site:go', 'SiteTool\Command\GoGoGo::run');
+    $crawlerCommand->setDescription("GoGoGo");
+    $application->add($crawlerCommand);
 
     return $application;
 }

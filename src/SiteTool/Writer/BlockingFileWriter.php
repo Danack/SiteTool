@@ -3,15 +3,11 @@
 
 namespace SiteTool\Writer;
 
-use Amp\File\Handle;
-use SiteTool\SiteToolException;
 use SiteTool\Writer;
-use function Amp\File\open;
-use function Amp\resolve;
 
-class FileWriter implements Writer
+class BlockingFileWriter implements Writer
 {
-    /** @var null|Handle */
+    /** @var \resource */
     private $fileHandle = null;
     private $filename;
 
@@ -30,25 +26,15 @@ class FileWriter implements Writer
 
     private function init()
     {
-        resolve(function () {
-            if ($this->fileHandle) {
-                return;
-            }
-
-            $this->fileHandle = yield open($this->filename, "w");
-            if ($this->fileHandle === false) {
-                throw new SiteToolException("Failed to open " . $this->filename . " for writing.");
-            }
-        });
+        $this->fileHandle = fopen($this->filename, "w");
     }
 
     public function __destruct()
     {
-        resolve(function () {
-            if ($this->fileHandle) {
-                yield $this->fileHandle->close();
-            }
-        });
+        if ($this->fileHandle !== null) {
+            fclose($this->fileHandle);
+            $this->fileHandle = null;
+        }
     }
 
     public function write($string, ...$otherStrings)
@@ -62,8 +48,6 @@ class FileWriter implements Writer
         $line .= implode(", ", $otherStrings);
         $line .= "\n";
 
-        resolve(function () use ($line) {
-            yield $this->fileHandle->write($line);
-        });
+        fwrite($this->fileHandle, $line);
     }
 }

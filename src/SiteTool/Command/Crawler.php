@@ -14,7 +14,7 @@ use SiteTool\EventProcessor\ShouldUrlFoundBeFollowed;
 use SiteTool\EventProcessor\LogResponseIsOk;
 use SiteTool\EventProcessor\LogSkippedLink;
 use SiteTool\GraphVizBuilder;
-use SiteTool\Event\FoundUrlToFollow;
+use SiteTool\Event\FoundUrlToFetch;
 use Zend\EventManager\EventManager;
 
 class Crawler
@@ -53,11 +53,17 @@ class Crawler
         }
         
         $firstUrlToCheck = new UrlToCheck('http://' . $crawlerConfig->domainName . $crawlerConfig->path, '/');
-        $foundUrlToFollow = new FoundUrlToFollow($firstUrlToCheck);
-        $eventManager->trigger(FoundUrlToFollow::class, null, [$foundUrlToFollow]);
+        $foundUrlToFollow = new FoundUrlToFetch($firstUrlToCheck);
+        $callables = $eventManager->trigger(FoundUrlToFetch::class, null, [$foundUrlToFollow]);
+
+        foreach ($callables as $callable) {
+            \Amp\call($callable);
+        }
+
+
         $outputWriter->write(OutputWriter::PROGRESS, "Start.");
 
-        \Amp\run(function () {});
+        \Amp\Loop::run(function () {});
         $outputWriter->write(OutputWriter::PROGRESS, "fin.");
     }
 }
