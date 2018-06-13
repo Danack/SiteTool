@@ -35,3 +35,35 @@ function createProcessSourceList(Injector $injector, $processSource)
         throw new \SiteTool\SiteToolException($message, 0, $ie);
     }
 }
+
+function createCrawlerConfig($initialUrl)
+{
+    $urlParts = parse_url($initialUrl);
+    if (array_key_exists('host', $urlParts) === false) {
+        echo "Could not determine domain name from " . $initialUrl . "\n";
+        echo "Please include the schema like http://example.com \n";
+        exit(-1);
+    }
+
+    $domainName = $urlParts['host'];
+    $initialPath = '/';
+
+    if (array_key_exists('path', $urlParts) === true) {
+        $initialPath = $urlParts['path'];
+    }
+
+    return new SiteTool\CrawlerConfig(
+        'http',
+        $domainName,
+        $initialPath
+    );
+}
+
+function createStandardResultReader(\SiteTool\AppConfig $appConfig)
+{
+    if ($appConfig->crawlOutput === null) {
+        throw new \Exception("CrawlOutput is not configured - can't know how to read crawl results");
+    }
+
+    return new \SiteTool\ResultReader\StandardResultReader($appConfig->crawlOutput);
+}

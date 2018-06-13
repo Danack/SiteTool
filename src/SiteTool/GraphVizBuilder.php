@@ -44,7 +44,7 @@ class GraphVizBuilder
 
     public function addEventTrigger($eventName, $eventSource)
     {
-        $eventName = normalizeEventName($eventName);
+        $eventName = \SiteTool\Functions::normalizeEventName($eventName);
         $this->graph->node($eventName, $this->eventParams);
         $switchParams = $this->switchParams;
         $switchParams['label'] = "<". wordwrap($eventSource, 15, "<br/>") . ">";
@@ -56,7 +56,7 @@ class GraphVizBuilder
     
     public function addEventListener($eventName, $eventListener)
     {
-        $eventName = normalizeEventName($eventName);
+        $eventName = \SiteTool\Functions::normalizeEventName($eventName);
         $this->graph->node($eventName, $this->eventParams);
         $this->graph->node($eventListener, $this->switchParams);
         $this->graph->edge([$eventName, $eventListener], $this->edgeParams);

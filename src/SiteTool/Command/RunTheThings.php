@@ -4,21 +4,13 @@ declare(strict_types=1);
 
 namespace SiteTool\Command;
 
-use Auryn\Injector;
 use SiteTool\ProcessSourceList;
+use function SiteTool\ampRunAllTheThings;
 
 class RunTheThings
 {
-    /** @var Injector  */
-    private $injector;
-
     /** @var  \SiteTool\EventProcessor\Relay[] */
     private $relays;
-
-    public function __construct(Injector $injector)
-    {
-        $this->injector = $injector;
-    }
 
     public function run(ProcessSourceList $processSourceList)
     {

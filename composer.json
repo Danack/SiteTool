@@ -10,20 +10,10 @@
             "homepage": "http://www.basereality.com"
         }
     ],
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/amphp/dns"
-        }
-    ],
     "autoload": {
         "psr-0": {
             "SiteTool": "src/"
-        },
-        "files": [
-          "src/functions.php",
-          "src/factories.php"
-        ]
+        }
     },
     "autoload-dev": {
         "psr-0": {

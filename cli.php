@@ -22,7 +22,7 @@ $cliInjectionParams = require __DIR__."/src/cliInjectionParams.php";
 $cliInjectionParams->addToInjector($injector);
 $tierApp = new TierCLIApp($injector);
 
-$app = createApplication();
+$app = \SiteTool\Functions::createApplication();
 $injector->share($app);
 
 define('TIER_ROUTING', 10);
