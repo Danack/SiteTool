@@ -41,7 +41,7 @@ class ApiCheckerProcessSourceList implements ProcessSourceList
             $relays[] = $this->injector->make($processorToCreate);
         }
 
-        return $processorsToCreate;
+        return $relays;
     }
 
     public function getSetupFunction()
