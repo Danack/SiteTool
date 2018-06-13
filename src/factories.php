@@ -5,7 +5,6 @@ declare(strict_types=1);
 use Amp\Artax\DefaultClient as ArtaxClient;
 use Auryn\Injector;
 
-
 /**
  * @param int $jobs
  * @return ArtaxClient
@@ -19,9 +18,6 @@ function createArtaxClient(int $jobs)
 
     return $client;
 }
-
-
-
 
 function createProcessSourceList(Injector $injector, $processSource)
 {

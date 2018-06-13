@@ -18,7 +18,7 @@ class CrawlerProcessSourceList implements ProcessSourceList
         $this->eventManager = $eventManager;
     }
 
-    public function getProcessList()
+    public function getEventProcessors()
     {
         $processorsToCreate = [
             \SiteTool\EventProcessor\ValidateHtmlToParse::class,
@@ -46,4 +46,3 @@ class CrawlerProcessSourceList implements ProcessSourceList
         $this->eventManager->trigger(EndOfProcessing::class, null, []);
     }
 }
-

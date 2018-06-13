@@ -2,15 +2,6 @@
 
 namespace SiteTool;
 
-function normalizeEventName($eventName)
-{
-    $lastSlashPos = strrpos($eventName, '\\');
-    if ($lastSlashPos !== false) {
-        return substr($eventName, $lastSlashPos + 1);
-    }
-    return $eventName;
-}
-
 class GraphVizBuilder
 {
     /** @var \Alom\Graphviz\Digraph */

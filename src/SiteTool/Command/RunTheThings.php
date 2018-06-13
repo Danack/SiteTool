@@ -22,14 +22,7 @@ class RunTheThings
 
     public function run(ProcessSourceList $processSourceList)
     {
-        $processorsToCreate = $processSourceList->getProcessList();
-
-        foreach ($processorsToCreate as $relayToCreate) {
-            // This just holds a references to the object, to stop
-            // it from being GC'd.
-            $this->relays[] = $this->injector->make($relayToCreate);
-        }
-
+        $this->relays = $processSourceList->getEventProcessors();
         $workers = [];
 
         foreach ($this->relays as $relay) {

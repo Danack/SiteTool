@@ -4,42 +4,45 @@ declare(strict_types=1);
 
 namespace SiteTool\ProcessSourceList;
 
-use SiteTool\EventProcessor\CheckContentTypeIsHtml;
+use Auryn\Injector;
 use SiteTool\EventProcessor\FetchUrl;
-use SiteTool\EventProcessor\ParseHtmlToFindLinks;
 use SiteTool\EventProcessor\CheckResponseIsOk;
-use SiteTool\EventProcessor\ShouldUrlFoundBeFollowed;
-use SiteTool\EventProcessor\LogResponseIsOk;
-use SiteTool\EventProcessor\LogSkippedLink;
 use SiteTool\ProcessSourceList;
 use SiteTool\UrlToCheck;
 use Zend\EventManager\EventManager;
 use SiteTool\Event\FoundUrlToFetch;
 use SiteTool\EventProcessor\ValidateApiResponse;
-use SiteTool\EventProcessor\ParseResponseToGenerateNextCall;
 use SiteTool\Event\EndOfProcessing;
-
 
 class ApiCheckerProcessSourceListOneByOne implements ProcessSourceList
 {
     /** @var EventManager */
     private $eventManager;
 
-    public function __construct(EventManager $eventManager)
+    /** @var Injector */
+    private $injector;
+
+    public function __construct(EventManager $eventManager, Injector $injector)
     {
         $this->eventManager = $eventManager;
+        $this->injector = $injector;
     }
 
-    public function getProcessList()
+    /**
+     * @return \SiteTool\EventProcessor\Relay[]
+     */
+    public function getEventProcessors()
     {
         $processorsToCreate = [
             FetchUrl::class,
-            //LogResponseIsOk::class,
-            //LogSkippedLink::class
             CheckResponseIsOk::class,
             ValidateApiResponse::class,
-            // ParseResponseToGenerateNextCall::class
         ];
+
+        $relays = [];
+        foreach ($processorsToCreate as $processorToCreate) {
+            $relays[] = $this->injector->make($processorToCreate);
+        }
 
         return $processorsToCreate;
     }
@@ -68,13 +71,7 @@ class ApiCheckerProcessSourceListOneByOne implements ProcessSourceList
             exit(-1);
         }
 
-        for ($id = $maxId; $id > 0; $id -= 50) {
-
-        }
-
-
-
-        $firstUrlToCheck = new UrlToCheck('http://api.local.aitekzfinance.com/articles?limit=50', 'http://api.local.aitekzfinance.com/');
+        $firstUrlToCheck = new UrlToCheck('http://api.local.aitekzfinance.com/articles?limit=50', null);
         $foundUrlToFollow = new FoundUrlToFetch($firstUrlToCheck);
         $this->eventManager->trigger(FoundUrlToFetch::class, null, [$foundUrlToFollow]);
     }
@@ -85,4 +82,3 @@ class ApiCheckerProcessSourceListOneByOne implements ProcessSourceList
         $this->eventManager->trigger(EndOfProcessing::class, null, []);
     }
 }
-

@@ -6,7 +6,7 @@ namespace SiteTool;
 
 interface ProcessSourceList
 {
-    public function getProcessList();
+    public function getEventProcessors();
 
     public function getSetupFunction();
 

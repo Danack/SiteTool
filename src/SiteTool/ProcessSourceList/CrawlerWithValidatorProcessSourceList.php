@@ -17,7 +17,6 @@ use Zend\EventManager\EventManager;
 use SiteTool\Event\FoundUrlToFetch;
 use SiteTool\Event\EndOfProcessing;
 
-
 class CrawlerWithValidatorProcessSourceList implements ProcessSourceList
 {
     /** @var EventManager */
@@ -28,7 +27,7 @@ class CrawlerWithValidatorProcessSourceList implements ProcessSourceList
         $this->eventManager = $eventManager;
     }
 
-    public function getProcessList()
+    public function getEventProcessors()
     {
         $processorsToCreate = [
 
@@ -63,4 +62,3 @@ class CrawlerWithValidatorProcessSourceList implements ProcessSourceList
         $this->eventManager->trigger(EndOfProcessing::class, null, []);
     }
 }
-

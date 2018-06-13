@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SiteTool\ProcessSourceList;
 
+use Auryn\Injector;
 use SiteTool\EventProcessor\CheckContentTypeIsHtml;
 use SiteTool\EventProcessor\FetchUrl;
 use SiteTool\EventProcessor\ParseHtmlToFindLinks;
@@ -22,12 +23,16 @@ class CrawlerProcessSourceList implements ProcessSourceList
     /** @var EventManager */
     private $eventManager;
 
-    public function __construct(EventManager $eventManager)
+    /** @var Injector */
+    private $injector;
+
+    public function __construct(EventManager $eventManager, Injector $injector)
     {
         $this->eventManager = $eventManager;
+        $this->injector = $injector;
     }
 
-    public function getProcessList()
+    public function getEventProcessors()
     {
         $processorsToCreate = [
             FetchUrl::class,
@@ -39,7 +44,12 @@ class CrawlerProcessSourceList implements ProcessSourceList
             LogSkippedLink::class
         ];
 
-        return $processorsToCreate;
+        $relays = [];
+        foreach ($processorsToCreate as $processorToCreate) {
+            $relays[] = $this->injector->make($processorToCreate);
+        }
+
+        return $relays;
     }
 
     public function getSetupFunction()
@@ -59,4 +69,3 @@ class CrawlerProcessSourceList implements ProcessSourceList
         $this->eventManager->trigger(EndOfProcessing::class, null, []);
     }
 }
-

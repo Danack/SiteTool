@@ -14,10 +14,8 @@ class StandardEventManager implements EventManager
     /** @var GraphVizBuilder  */
     private $graphVizTest;
     
-    public function __construct(
-        ZendEventManager $zendEventManager,
-        GraphVizBuilder $graphVizTest
-    ) {
+    public function __construct(ZendEventManager $zendEventManager, GraphVizBuilder $graphVizTest)
+    {
         $this->zendEventManager = $zendEventManager;
         $this->graphVizTest = $graphVizTest;
     }
